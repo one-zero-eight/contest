@@ -25,6 +25,7 @@ body {
     position: absolute;
     left: var(--gap);
     bottom: var(--gap);
+    user-select: none;
 }
 
 .administrator-hints {

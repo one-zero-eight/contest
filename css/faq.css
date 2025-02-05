@@ -200,6 +200,11 @@ body {
     transform: translateY(0%) !important;
 }
 
+.text-link {
+    font-weight: 900;
+    color: rgb(151, 196, 47);
+}
+
 @media (width < 475px) {
     .navigation-bar__menu {
         width: 100dvw;

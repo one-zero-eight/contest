@@ -15,6 +15,13 @@
 </head>
 
 <body>
+    <div class="functions functions_separated">
+        <img id="uv" class="functions__function" src="/images/UV.svg">
+        <a id="hint" download href="/images/T_TShirt_HI_8K.png" data-hrefs="/images/T_TShirt_HI_8K.png,/images/T_Hoodie_HI_8K.png,/images/T_Cap_HI_8K.png,/images/T_Pants_HI_8K.png"><img class="functions__function" src="/images/Hints.svg"></a>
+        <a id="bw" download href="/images/T_TShirt_BW_8K.png" data-hrefs="/images/T_TShirt_BW_8K.png,/images/T_Hoodie_BW_8K.png,/images/T_Cap_BW_8K.png,/images/T_Pants_BW_8K.png"><img class="functions__function" src="/images/BW.svg"></a>
+        <img id="question" src="/images/Question.svg" class="functions__function" alt="Question">
+    </div>
+
     <div class="control-panel">
         <form class="control-panel__form">
             <label for="f">
@@ -32,7 +39,7 @@
 
         <form class="control-panel__form coordinate-bottom-left">
             <label class="sensetivity-label" for="k">
-                <div class="button">Change sensetivity</div>
+                <div class="button">Change sensitivity</div>
                 <input value="10" class="none" min="1" max="100" id="k" type="range">
             </label>
         </form>
@@ -41,8 +48,8 @@
 
         </div>
         <div class="functions">
-            <img id="uv" src="/images/UV.svg" class="functions__function" alt="UV">
-            <img id="question" src="/images/Question.svg" class="functions__function" alt="Question">
+            <a id="model" download href="/models/TShirt.zip" data-hrefs="/models/TShirt.zip,/models/Hoodie.zip,/models/Cap.zip,/models/Pants.zip"><img src="/images/Download.svg" class="functions__function" alt="Download"></a>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSdgyEkD_6H5_fu10R4HBVoQYzdbn76PtJAdAgs7mAD50jNoWQ/viewform?usp=sharing"><img src="/images/Send.svg" class="functions__function" alt="Submit"></a>
         </div>
     </div>
 
@@ -62,8 +69,12 @@
 
     <div class="darken none"></div>
     <div class="rules none">
-        <h1>How to draw?</h1>
-        <p class="rules__item">1. Choose a model from the third slide</p>
+        <h2>What are these buttons?</h2>
+        <p class="rules__item">1. Stripes button — to watch a currently applied texture</p>
+        <p class="rules__item">2. Dash line button — to download the drawing guides for the current model</p>
+        <p class="rules__item">3. BW mask button — to download the mask for the current model</p>
+        <h2>How to draw?</h2>
+        <p class="rules__item">1. Choose a model from the third slide, click on them to switch (or do it here, there is also a "download&nbsp;the&nbsp;model" button near the submition button)</p>
         <img class="rules__image" src="/images/Tutorial1.png" alt="Tutorial 1" data-revolution="/images/Tutorial1Revolution.png">
         <p class="rules__item">2. Download the image hint, or the mask image, or all together</p>
         <img class="rules__image" src="/images/Tutorial2.png" alt="Tutorial 2" data-revolution="/images/Tutorial2Revolution.png">
@@ -82,8 +93,8 @@
             <img class="carousel__image invisible" src="/images/Step4.png" alt="Step 4" data-revolution="/images/Step4Revolution.png">
         </div>
         <p class="rules__item">4. Test your textures in 3D&nbsp;Applier by choosing them in the Apply button's popup window</p>
-        <h2>Hints</h2>
-        <p class="rules__item">You can watch a current texture and its mapping flow in the popup menu of button with stripes</p>
+        <p class="rules__item">5. Submit <a href="https://docs.google.com/forms/d/e/1FAIpQLSdgyEkD_6H5_fu10R4HBVoQYzdbn76PtJAdAgs7mAD50jNoWQ/viewform?usp=sharing" class="text-link">the&nbsp;form</a> with your artwork</p>
+        <h3>Hints</h3>
         <p class="rules__item">The color of inner sides of models can be changed by filling the background of textures, black space on masks</p>
         <p class="rules__item">Use left click or single touch, hold, and move to revolute models</p>
         <p class="rules__item">Use wheel or double touch and move to fly closer to models or further away from them</p>

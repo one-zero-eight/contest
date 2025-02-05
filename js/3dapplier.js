@@ -3,7 +3,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 
 let currentModelIdentifier = 0
 let identifiers = [0, 1, 2, 3]
-const models = ["/models/TShirt.glb", "/models/Cap.glb", "/models/Pants.glb", "/models/SportPants.glb",]
+const models = ["/models/TShirt.glb", "/models/Hoodie.glb", "/models/Cap.glb", "/models/Pants.glb"]
 const scenes = []
 const cameras = []
 const renderers = []
@@ -14,42 +14,48 @@ for (let i of identifiers) {
     cameras.push(new THREE.PerspectiveCamera(75, 1, 0.1, 1000))
     renderers.push(new THREE.WebGLRenderer({ antialias: true }))
     loaders.push(new GLTFLoader())
-    lights.push(new THREE.HemisphereLight(0xffffff, 0x000000, 3))
+    lights.push(new THREE.HemisphereLight(0xffffff, 0x717173, 3))
 }
 
-const minimodels = ["/models/TShirt.glb", "/models/Cap.glb", "/models/Pants.glb", "/models/SportPants.glb",]
+const minimodels = ["/models/TShirt.glb", "/models/Hoodie.glb", "/models/Cap.glb", "/models/Pants.glb"]
 const miniscenes = []
 const minicameras = []
 const minirenderers = []
 const miniloaders = []
 const minilights = []
+const clocks = []
+const deltas = []
 for (let i of identifiers) {
     miniscenes.push(new THREE.Scene())
     minicameras.push(new THREE.PerspectiveCamera(50, 1, 0.1, 1000))
     minirenderers.push(new THREE.WebGLRenderer({ antialias: true }))
     miniloaders.push(new GLTFLoader())
     minilights.push(new THREE.HemisphereLight(0xffffff, 0x000000, 3))
+    clocks.push(new THREE.Clock())
+    deltas.push(0)
 }
 
 // initialize models
 for (let i of identifiers) {
     loaders[i].load(models[i], function (gltf) {
         scenes[i].add(gltf.scene)
+        let texture = (new THREE.TextureLoader()).load("/images/White.png")
+        texture.flipY = false
+        let normals = (new THREE.TextureLoader()).load(models[i].replace("models/", "images/T_").replace(".glb", "_NL_8K.png"))
+        normals.flipY = false
         gltf.scene.traverse(o => {
             if (o.isMesh) {
-                let texture = (new THREE.TextureLoader()).load("/images/White.png")
-                texture.flipY = false
-                o.material = new THREE.MeshStandardMaterial({ map: texture })
-                models[i] = o
+                o.material = new THREE.MeshStandardMaterial({ map: texture, normalMap: normals })
             }
         })
+        models[i] = gltf.scene
     }, undefined, function (error) {
         console.error(error)
     })
 
     cameras[i].position.z = 150
     scenes[i].add(lights[i])
-    renderers[i].setSize(2560, 2560)
+    renderers[i].setSize(1920, 1920)
     renderers[i].setClearColor(0x16161a, 0)
     renderers[i].setAnimationLoop(() => {
         renderers[i].render(scenes[i], cameras[i])
@@ -64,10 +70,12 @@ for (let i of identifiers) {
         miniscenes[i].add(gltf.scene)
         gltf.scene.traverse(o => {
             if (o.isMesh) {
-                minimodels[i] = o
-                o.material = new THREE.MeshStandardMaterial({})
+                let normals = (new THREE.TextureLoader()).load(minimodels[i].replace("models/", "images/T_").replace(".glb", "_NL_8K.png"))
+                normals.flipY = false
+                o.material = new THREE.MeshStandardMaterial({ normalMap: normals })
             }
         })
+        minimodels[i] = gltf.scene
     }, undefined, function (error) {
         console.error(error)
     })
@@ -77,10 +85,14 @@ for (let i of identifiers) {
     minirenderers[i].setSize(500, 500)
     minirenderers[i].setClearColor(0x2b2b2c, 0)
     minirenderers[i].setAnimationLoop(() => {
-        minirenderers[i].render(miniscenes[i], minicameras[i])
-        try {
-            minimodels[i].rotation.y += 0.01
-        } catch { }
+        deltas[i] += clocks[i].getDelta()
+        if (deltas[i] > 0.04) {
+            minirenderers[i].render(miniscenes[i], minicameras[i])
+            try {
+                minimodels[i].rotation.y += 0.02
+            } catch { }
+            deltas[i] = 0
+        }
     })
     document.querySelector(".control-panel__window").appendChild(minirenderers[i].domElement)
     minirenderers[i].domElement.classList.add("control-panel__window__model")
@@ -105,6 +117,10 @@ function updateEverything() {
         }
     }
     document.querySelector(".viewers").style.transform = `translateX(calc(${document.querySelector(".viewer").clientWidth}px * -${currentModelIdentifier}))`
+
+    document.querySelector("#hint").setAttribute("href", document.querySelector("#hint").getAttribute("data-hrefs").split(',')[currentModelIdentifier])
+    document.querySelector("#bw").setAttribute("href", document.querySelector("#bw").getAttribute("data-hrefs").split(',')[currentModelIdentifier])
+    document.querySelector("#model").setAttribute("href", document.querySelector("#model").getAttribute("data-hrefs").split(',')[currentModelIdentifier])
 }
 
 // scene manipulations
@@ -159,7 +175,11 @@ document.querySelector("form").addEventListener("change", () => {
         let textureLoader = new THREE.TextureLoader()
         let texture = textureLoader.load(e.target.result)
         texture.flipY = false
-        models[currentModelIdentifier].material.map = texture
+        models[currentModelIdentifier].traverse(o => {
+            if (o.isMesh) {
+                o.material.map = texture
+            }
+        })
     }
     document.querySelector("form").reset()
 })
@@ -172,14 +192,19 @@ document.querySelectorAll("form")[2].addEventListener("change", (event) => {
     sensetivity = document.querySelector("#k").value / 1000
 })
 
-let masks = ["/images/T_TShirt_BW_8K.png", "/images/T_Cap_BW_8K.png", "/images/T_Pants_BW_8K.png", "/images/T_SportPants_BW_8K.png"]
+let masks = ["/images/T_TShirt_BW_8K.png", "/images/T_Hoodie_BW_8K.png", "/images/T_Cap_BW_8K.png", "/images/T_Pants_BW_8K.png"]
 // buttons
 document.querySelector("#uv").addEventListener("click", () => {
-    document.querySelector("#texture").setAttribute("src", models[currentModelIdentifier].material.map.image.getAttribute("src"))
+    let foundModel
+    models[currentModelIdentifier].traverse(o => {
+        if (o.isMesh) {
+            foundModel = o
+        }
+    })
+    document.querySelector("#texture").setAttribute("src", foundModel.material.map.image.getAttribute("src"))
     document.querySelector("#mask").setAttribute("src", masks[currentModelIdentifier])
     document.querySelector(".uv").classList.toggle("none")
 })
-
 document.querySelector(".uv").addEventListener("click", (event) => {
     document.querySelector(".uv").classList.toggle("none")
 })
@@ -241,3 +266,41 @@ function creamSoda(event) {
     }
 }
 creamSoda({ target: window })
+
+
+// gestures recognition
+let gesturePreviousTouchX = 0
+let gesturePreviousTouchY = 0
+let threshold = 50
+let gestureStarted = false
+document.querySelector(".control-panel__window").addEventListener("touchstart", (event) => {
+    gesturePreviousTouchX = event.touches[0].screenX
+    gesturePreviousTouchY = event.touches[0].screenY
+    gestureStarted = true
+})
+document.querySelector(".control-panel__window").addEventListener("touchmove", (event) => {
+    if (!gestureStarted)
+        return
+    if (window.matchMedia("(orientation: portrait)")["matches"]) {
+        if (event.touches[0].screenX - gesturePreviousTouchX < -threshold) {
+            currentModelIdentifier = Math.min(currentModelIdentifier + 1, 3)
+            gestureStarted = false
+        } else if (event.touches[0].screenX - gesturePreviousTouchX > threshold) {
+            currentModelIdentifier = Math.max(currentModelIdentifier - 1, 0)
+            gestureStarted = false
+        }
+    } else {
+        if (event.touches[0].screenY - gesturePreviousTouchY < -threshold) {
+            currentModelIdentifier = Math.min(currentModelIdentifier + 1, 3)
+            gestureStarted = false
+        } else if (event.touches[0].screenY - gesturePreviousTouchY > threshold) {
+            currentModelIdentifier = Math.max(currentModelIdentifier - 1, 0)
+            gestureStarted = false
+        }
+    }
+
+    updateEverything()
+})
+document.querySelector(".control-panel__window").addEventListener("touchend", (event) => {
+    gestureStarted = false
+})

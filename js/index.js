@@ -233,18 +233,22 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 
 let currentModelIdentifier = 1
 let identifiers = [0, 1, 2, 3, 4]
-const models = ["/models/TShirt.glb", "/models/Cap.glb", "/models/Pants.glb", "/models/SportPants.glb", "/models/Lantern.glb"]
+const models = ["/models/TShirt.glb", "/models/Hoodie.glb", "/models/Cap.glb", "/models/Pants.glb", "/models/Lantern.glb"]
 const scenes = []
 const cameras = []
 const renderers = []
 const loaders = []
 const lights = []
+const clocks = []
+const deltas = []
 for (let i of identifiers) {
     scenes.push(new THREE.Scene())
     cameras.push(new THREE.PerspectiveCamera(75, 1, 0.1, 1000))
     renderers.push(new THREE.WebGLRenderer({ antialias: true }))
     loaders.push(new GLTFLoader())
-    lights.push(new THREE.HemisphereLight(0xffffff, 0x000000, 3))
+    lights.push(new THREE.HemisphereLight(0xffffff, 0x717173, 3))
+    clocks.push(new THREE.Clock())
+    deltas.push(0)
 }
 
 
@@ -252,25 +256,34 @@ for (let i of identifiers) {
     loaders[i].load(models[i], function (gltf) {
         scenes[i].add(gltf.scene)
         if (i != 4) {
+            let normals = (new THREE.TextureLoader()).load(models[i].replace("models/", "images/T_").replace(".glb", "_NL_8K.png"))
+            normals.flipY = false
             gltf.scene.traverse(o => {
                 if (o.isMesh) {
-                    o.material = new THREE.MeshStandardMaterial({})
-                    models[i] = o
+                    o.material = new THREE.MeshStandardMaterial({ normalMap: normals })
+
                 }
             })
-        } else {
-            models[i] = gltf.scene
         }
+        models[i] = gltf.scene
     }, undefined, function (error) {
         console.error(error)
     })
 
     cameras[i].position.z = 100
     scenes[i].add(lights[i])
-    renderers[i].setSize(2560, 2560)
+    renderers[i].setSize(1920, 1920)
     renderers[i].setClearColor(0x16161a, 0)
     renderers[i].setAnimationLoop(() => {
-        renderers[i].render(scenes[i], cameras[i])
+        deltas[i] += clocks[i].getDelta()
+        if (deltas[i] > 0.04) {
+            renderers[i].render(scenes[i], cameras[i])
+            if (i != 4)
+                try {
+                    models[i].rotation.y += 0.02
+                } catch { }
+            deltas[i] = 0
+        }
     })
     if (i == 4) {
         document.querySelector(".horizontal-text-block").appendChild(renderers[i].domElement)
@@ -339,11 +352,9 @@ function updatePreviews() {
 // interactions
 let previous_scroll_location = window.scrollY
 document.addEventListener("scroll", (event) => {
-    for (let i of identifiers) {
-        try {
-            models[i].rotation.y += (previous_scroll_location - window.scrollY > 0 ? 1 : -1) * 0.03
-        } catch { }
-    }
+    try {
+        models[identifiers[identifiers.length - 1]].rotation.y += (previous_scroll_location - window.scrollY > 0 ? 1 : -1) * 0.03
+    } catch { }
     previous_scroll_location = window.scrollY
 })
 
@@ -371,6 +382,13 @@ intersectionObserver.observe(document.querySelector("h5"))
 
 // css can't
 function Up(event) {
+    // menu trans enabling
+    if (event.target.matchMedia("(width < 475px)")["matches"]) {
+        setTimeout(() => { document.querySelector(".navigation-bar__menu").classList.add("trans") }, 500)
+    } else {
+        setTimeout(() => { document.querySelector(".navigation-bar__menu").classList.remove("trans") }, 500)
+    }
+
     if (event.target.innerHeight <= event.target.innerWidth)
         return
     for (let elem of document.querySelectorAll(".slide")) {
@@ -383,6 +401,43 @@ function Up(event) {
 }
 Up({ target: window })
 window.addEventListener("resize", Up)
+
+// gestures recognition
+let previousTouchX = 0
+let previousTouchY = 0
+let threshold = 50
+let gestureStarted = false
+document.querySelector(".slide__window").addEventListener("touchstart", (event) => {
+    previousTouchX = event.touches[0].screenX
+    previousTouchY = event.touches[0].screenY
+    gestureStarted = true
+})
+document.querySelector(".slide__window").addEventListener("touchmove", (event) => {
+    if (!gestureStarted)
+        return
+    if (window.matchMedia("(orientation: portrait)")["matches"]) {
+        if (event.touches[0].screenX - previousTouchX < -threshold) {
+            currentModelIdentifier = Math.min(currentModelIdentifier + 1, 3)
+            gestureStarted = false
+        } else if (event.touches[0].screenX - previousTouchX > threshold) {
+            currentModelIdentifier = Math.max(currentModelIdentifier - 1, 0)
+            gestureStarted = false
+        }
+    } else {
+        if (event.touches[0].screenY - previousTouchY < -threshold) {
+            currentModelIdentifier = Math.min(currentModelIdentifier + 1, 3)
+            gestureStarted = false
+        } else if (event.touches[0].screenY - previousTouchY > threshold) {
+            currentModelIdentifier = Math.max(currentModelIdentifier - 1, 0)
+            gestureStarted = false
+        }
+    }
+
+    updatePreviews()
+})
+document.querySelector(".slide__window").addEventListener("touchend", (event) => {
+    gestureStarted = false
+})
 
 // to bottom
 document.querySelector("#tobottom").addEventListener("click", () => {

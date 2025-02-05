@@ -17,6 +17,7 @@ a {
     --roundness: 40px;
     --vbox: 300px;
     --button-padding: 30px;
+    --navigation-bar-height: 70px;
 }
 
 body {
@@ -26,6 +27,95 @@ body {
     box-sizing: border-box;
     background-color: var(--bc);
     overflow-x: hidden;
+}
+
+.navigation-bar-support {
+    position: fixed;
+    background-color: var(--bc);
+    height: var(--navigation-bar-height);
+    width: 100%;
+}
+
+.navigation-bar {
+    position: fixed;
+    width: 90%;
+    max-width: 1000px;
+    height: var(--navigation-bar-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navigation-bar__logo {
+    height: 100%;
+    width: fit-content;
+    padding: 20px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.navigation-bar__logo__image {
+    height: 100%;
+}
+
+.navigation-bar__menu {
+    width: 100%;
+    max-width: 500px;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    height: calc(var(--navigation-bar-height) - 40px);
+    border-radius: 15px;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--bg);
+}
+
+.navigation-bar__menu__item {
+    font: 400 18px/0px "Roboto";
+    color: white;
+    transition: all 200ms;
+    user-select: none;
+
+}
+
+.navigation-bar__menu__item:hover {
+    font-weight: 900;
+}
+
+.burger {
+    height: 30%;
+    aspect-ratio: 16/9;
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.burger__line-1 {
+    height: 50%;
+    width: 100%;
+    background-color: white;
+    transition: all 500ms;
+}
+
+.burger__line-1_full {
+    height: 90%;
+}
+
+.burger__line-2 {
+    height: 10%;
+    width: 100%;
+    background-color: white;
+}
+
+.navigation-bar__menu__item {
+    line-height: 50px;
+}
+
+.spacer {
+    height: var(--navigation-bar-height);
+    width: 100%;
+    background-color: var(--bg);
 }
 
 .grid {
@@ -157,6 +247,10 @@ body {
 
 /* modifiers */
 
+.top-100 {
+    transform: translateY(0%) !important;
+}
+
 .transparent {
     opacity: 0;
     pointer-events: none;
@@ -260,7 +354,7 @@ body {
         width: 50%;
     }
 
-    a {
+    a[id="get"] {
         flex-grow: 1;
     }
 
@@ -367,3 +461,38 @@ body {
         border-radius: 5px;
     }
 }
+
+@media (width < 475px) {
+    .navigation-bar__menu {
+        width: 100dvw;
+        max-width: unset;
+        height: 100dvh;
+        position: absolute;
+        top: 0;
+        left: -5dvw;
+        border-radius: 0;
+        flex-direction: column;
+        justify-content: center;
+        transform: translateY(-100dvh);
+        transition: all 500ms;
+    }
+
+    .burger {
+        display: flex;
+        position: absolute;
+        right: 20px;
+    }
+
+    :root {
+        --navigation-bar-height: 50px;
+    }
+
+    .navigation-bar__logo {
+        padding: 15px;
+    }
+
+    .slide {
+        padding-top: 60px;
+    }
+}
+
