@@ -17,13 +17,13 @@ async function someBrowsersDoNotSupportGlobalAwaits() {
     let sheetResponse
 
     try {
-        filesResponse = await (await fetch("https://www.googleapis.com/drive/v3/files?q='1BHeR3ZdgC78LlmGCWX-VjlHYXkfbC0YVWngzeaQ5S5GXXUo5jMQicIOlS9hlYOyo0p4p2cXT'+in+parents&key=")).json()
+        filesResponse = await (await fetch("https://www.googleapis.com/drive/v3/files?q='1BHeR3ZdgC78LlmGCWX-VjlHYXkfbC0YVWngzeaQ5S5GXXUo5jMQicIOlS9hlYOyo0p4p2cXT'+in+parents&key=AIzaSyAaK_K5ZedO5Gez6qd45s--Djk8XyqeBBw")).json()
     } catch (e) {
         alert(apiMessage)
     }
 
     try {
-        sheetResponse = await (await fetch("https://sheets.googleapis.com/v4/spreadsheets/1zAAbzVA5-qK7UevrBGPiIJ0uHYu9wcegUK0pTES0JSw/values/Sheet1?key=")).json()
+        sheetResponse = await (await fetch("https://sheets.googleapis.com/v4/spreadsheets/1zAAbzVA5-qK7UevrBGPiIJ0uHYu9wcegUK0pTES0JSw/values/Sheet1?key=AIzaSyAaK_K5ZedO5Gez6qd45s--Djk8XyqeBBw")).json()
     } catch (e) {
         alert(apiMessage)
     }
@@ -45,7 +45,7 @@ async function someBrowsersDoNotSupportGlobalAwaits() {
     for (let [i, file] of filesResponseBounded.entries()) {
         let response
         try {
-            response = await (await fetch(`https://www.googleapis.com/drive/v3/files/${file["id"]}?key=&alt=media`)).blob()
+            response = await (await fetch(`https://www.googleapis.com/drive/v3/files/${file["id"]}?key=AIzaSyAaK_K5ZedO5Gez6qd45s--Djk8XyqeBBw&alt=media`)).blob()
         } catch (e) {
             alert(apiMessage)
         }
