@@ -346,7 +346,9 @@ function updatePreviews() {
         }
     }
     for (let elem of document.querySelectorAll(".button"))
-        elem.parentElement.setAttribute("href", elem.parentElement.getAttribute("data-paths").split(",")[currentModelIdentifier])
+        elem.setAttribute("href", elem.getAttribute("data-paths").split(",")[currentModelIdentifier])
+    let thingName = document.querySelector(".buttons-text > span")
+    thingName.innerHTML = thingName.getAttribute("data-names").split(",")[currentModelIdentifier]
 }
 
 // interactions
@@ -437,11 +439,4 @@ document.querySelector(".slide__window").addEventListener("touchmove", (event) =
 })
 document.querySelector(".slide__window").addEventListener("touchend", (event) => {
     gestureStarted = false
-})
-
-// to bottom
-document.querySelector("#tobottom").addEventListener("click", () => {
-    window.scrollTo({ "behavior": "smooth", "top": document.querySelector("#contacts").offsetTop })
-    if (document.querySelector(".burger__line-1").classList.contains("burger__line-1_full"))
-        burger()
 })

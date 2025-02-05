@@ -83,6 +83,11 @@ body {
     font-weight: 900;
 }
 
+.text-link {
+    font-weight: 900;
+    color: rgb(132, 171, 41);
+}
+
 .burger {
     height: 30%;
     aspect-ratio: 16/9;
