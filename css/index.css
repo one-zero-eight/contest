@@ -1055,6 +1055,12 @@
             height: 50%;
         }
 
+        .slide__buttons {
+            flex-direction: row;
+            justify-content: space-evenly;
+            width: 90%;
+        }
+
         .button {
             width: calc((100dvw - 10dvw) / 4);
             padding: 10px;
