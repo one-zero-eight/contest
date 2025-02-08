@@ -720,10 +720,14 @@
     }
 
     .slide__buttons {
-        width: calc(60% - var(--slide-window-size));
+        width: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
+    }
+
+    .slide__buttons_labeled {
+        width: calc(60% - var(--slide-window-size));
     }
 
     .button {
@@ -836,6 +840,10 @@
             }
 
             .slide__buttons {
+                width: 100%;
+            }
+
+            .slide__buttons_labeled {
                 width: calc(70% - var(--slide-window-size));
             }
         }
@@ -950,6 +958,10 @@
             }
 
             .slide__buttons {
+                width: 100%;
+            }
+
+            .slide__buttons_labeled {
                 width: calc(50% - var(--slide-window-size));
             }
 
@@ -1058,6 +1070,10 @@
         .slide__buttons {
             flex-direction: row;
             justify-content: space-evenly;
+            width: 100%;
+        }
+
+        .slide__buttons_labeled {
             width: 90%;
         }
 
@@ -1260,6 +1276,10 @@
             }
 
             .slide__buttons {
+                width: 100%;
+            }
+
+            .slide__buttons_labeled {
                 width: 90dvw;
             }
 
@@ -2111,10 +2131,14 @@
     }
 
     .slide__buttons {
-        width: calc(60% - var(--slide-window-size));
+        width: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
+    }
+
+    .slide__buttons_labeled {
+        width: calc(60% - var(--slide-window-size));
     }
 
     .button {
@@ -2227,6 +2251,10 @@
             }
 
             .slide__buttons {
+                width: 100%;
+            }
+
+            .slide__buttons_labeled {
                 width: calc(70% - var(--slide-window-size));
             }
         }
@@ -2341,6 +2369,10 @@
             }
 
             .slide__buttons {
+                width: 100%;
+            }
+
+            .slide__buttons_labeled {
                 width: calc(50% - var(--slide-window-size));
             }
 
@@ -2449,6 +2481,10 @@
         .slide__buttons {
             flex-direction: row;
             justify-content: space-evenly;
+            width: 100%;
+        }
+
+        .slide__buttons_labeled {
             width: 90%;
         }
 
@@ -2651,6 +2687,10 @@
             }
 
             .slide__buttons {
+                width: 100%;
+            }
+
+            .slide__buttons_labeled {
                 width: 90dvw;
             }
 
