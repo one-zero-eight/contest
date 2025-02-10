@@ -135,6 +135,7 @@ body {
 
 .grid__placeholder-item {
     width: 100%;
+    max-width: 500px;
     aspect-ratio: 1;
     background: linear-gradient(90deg, transparent, white, transparent);
     background-size: 200%;
