@@ -71,7 +71,7 @@ function createModelWindow(i, blobResponse) {
     cameras.push(new THREE.PerspectiveCamera(75, 1, 0.1, 1000))
     renderers.push(new THREE.WebGLRenderer({ antialias: true }))
     loaders.push(new GLTFLoader())
-    lights.push(new THREE.HemisphereLight(0xffffff, 0x000000, 3))
+    lights.push(new THREE.HemisphereLight(0xffffff, 0x717173, 3))
 
     loaders[i].load({
         "T-Shirt": "/models/TShirt.glb",
