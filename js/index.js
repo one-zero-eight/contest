@@ -218,10 +218,14 @@ if (!CSS.supports("animation-timeline", "scroll()")) {
             }
         ))
     }
+    let populateWithAnimationsCall
     window.addEventListener("resize", () => {
-        for (let animation of animations)
-            animation.cancel()
-        populateWithAnimations()
+        clearTimeout(populateWithAnimationsCall)
+        populateWithAnimationsCall = setTimeout(() => {
+            for (let animation of animations)
+                animation.cancel()
+            populateWithAnimations()
+        }, 1000)
     })
     populateWithAnimations()
 }
@@ -251,7 +255,7 @@ for (let i of identifiers) {
     deltas.push(0)
 }
 
-
+let times = 5
 for (let i of identifiers) {
     loaders[i].load(models[i], function (gltf) {
         scenes[i].add(gltf.scene)
@@ -266,13 +270,16 @@ for (let i of identifiers) {
             })
         }
         models[i] = gltf.scene
+        times -= 1
+        if (times == 0)
+            document.querySelector(".loading").remove()
     }, undefined, function (error) {
         console.error(error)
     })
 
     cameras[i].position.z = 100
     scenes[i].add(lights[i])
-    renderers[i].setSize(1920, 1920)
+    renderers[i].setSize(window.innerWidth < 800 ? 480 : 1080, window.innerWidth < 800 ? 480 : 1080)
     renderers[i].setClearColor(0x16161a, 0)
     renderers[i].setAnimationLoop(() => {
         deltas[i] += clocks[i].getDelta()

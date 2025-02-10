@@ -1,3 +1,33 @@
+.loading {
+    padding: 20px;
+    box-sizing: border-box;
+    width: 100dvw;
+    height: 100dvh;
+    background: rgba(0, 0, 0, 0.85);
+    text-align: center;
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 1000;
+}
+
+.loading__image {
+    margin: 20px;
+    width: 100px;
+    animation: loading infinite cubic-bezier(0.78, 0.08, 0.61, 0.99) 2000ms;
+}
+
+@keyframes loading {
+    from {
+        transform: rotateZ(0deg);
+    }
+    to {
+        transform: rotateZ(360deg);
+    }
+}
+
 @supports (animation-timeline: view()) and (animation-timeline: scroll()) {
     * {
         padding: 0;
