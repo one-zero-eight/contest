@@ -1,3 +1,95 @@
+.loading {
+    padding: 20px;
+    box-sizing: border-box;
+    width: 100dvw;
+    height: 100dvh;
+    background: rgba(0, 0, 0, 0.85);
+    text-align: center;
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 1000;
+}
+
+.loading__image {
+    margin: 20px;
+    width: 100px;
+    animation: loading infinite cubic-bezier(0.78, 0.08, 0.61, 0.99) 2000ms;
+}
+
+@keyframes loading {
+    from {
+        transform: rotateZ(0deg);
+    }
+    to {
+        transform: rotateZ(360deg);
+    }
+}
+
+.figure__text {
+    font: 500 40px/50px "Roboto";
+    width: 40%;
+    color: white;
+}
+
+.bottom-subfont {
+        font: 400 16px/30px "Roboto";
+        color: white;
+        text-align: center;
+    }
+
+@media (width < 844px) {
+    .figure__text {
+        font-size: 32px;
+    }
+
+    .bottom-subfont {
+                font-size: 12px;
+            }
+}
+
+@media (width < 675px) {
+     .figure__text {
+            font-size: 25px;
+            line-height: 40px;
+    }
+}
+
+ @media (width < 470px) {
+    .figure__text {
+                font-size: 18px;
+                line-height: 25px;
+            }
+ }
+
+@media (orientation: portrait) {
+    .figure__text {
+            width: 100%;
+            text-align: center;
+        }
+}
+
+@media (width < 698px) {
+    .figure__text {
+                font-size: 32px;
+            }
+            .bottom-subfont {
+                font-size: 12px;
+            }
+}
+
+@media (width < 475px) {
+    .figure__text {
+                font-size: 25px;
+                line-height: 40px;
+            }
+            .bottom-subfont {
+                line-height: 20px;
+            }
+}
+
 * {
     padding: 0;
     margin: 0;
@@ -490,6 +582,8 @@ h3 {
 
     .functions_separated {
         flex-direction: column;
+        height: calc(100dvh - 2 * var(--panel-width));
+        margin-top: var(--panel-width);
     }
 
     .functions__function {

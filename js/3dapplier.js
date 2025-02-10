@@ -36,6 +36,7 @@ for (let i of identifiers) {
 }
 
 // initialize models
+let times = 8
 for (let i of identifiers) {
     loaders[i].load(models[i], function (gltf) {
         scenes[i].add(gltf.scene)
@@ -49,13 +50,16 @@ for (let i of identifiers) {
             }
         })
         models[i] = gltf.scene
+        times -= 1
+        if (times == 0)
+            document.querySelector(".loading").remove()
     }, undefined, function (error) {
         console.error(error)
     })
 
     cameras[i].position.z = 150
     scenes[i].add(lights[i])
-    renderers[i].setSize(1920, 1920)
+    renderers[i].setSize(window.innerWidth < 800 ? 720 : 1920, window.innerWidth < 800 ? 720 : 1920)
     renderers[i].setClearColor(0x16161a, 0)
     renderers[i].setAnimationLoop(() => {
         renderers[i].render(scenes[i], cameras[i])
@@ -76,6 +80,9 @@ for (let i of identifiers) {
             }
         })
         minimodels[i] = gltf.scene
+        times -= 1
+        if (times == 0)
+            document.querySelector(".loading").remove()
     }, undefined, function (error) {
         console.error(error)
     })
