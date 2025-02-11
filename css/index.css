@@ -1403,7 +1403,7 @@
         }
     }
 
-    @media (width < 475px) {
+    @media (width < 570px) {
         .navigation-bar__menu {
             width: 100dvw;
             max-width: unset;
@@ -2814,7 +2814,7 @@
         }
     }
 
-    @media (width < 475px) {
+    @media (width < 570px) {
         .navigation-bar__menu {
             width: 100dvw;
             max-width: unset;
