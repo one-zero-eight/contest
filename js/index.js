@@ -361,10 +361,10 @@ function updatePreviews() {
 // interactions
 let previousScrollLocation = window.scrollY
 document.addEventListener("scroll", (event) => {
+    previousScrollLocation = window.scrollY
     try {
         models[identifiers[identifiers.length - 1]].rotation.y += (previousScrollLocation - window.scrollY > 0 ? 1 : -1) * 0.03
     } catch { }
-    previousScrollLocation = window.scrollY
 })
 
 
@@ -392,6 +392,17 @@ intersectionObserver.observe(document.querySelector("h5"))
 // css can't
 let dvhRemember = window.innerHeight
 function Up(event) {
+    // scroll dvh sync
+    if (dvhRemember <= previousScrollLocation && previousScrollLocation <= dvhRemember + 2000) {
+        window.scrollTo(0, previousScrollLocation + window.innerHeight - dvhRemember)
+        previousScrollLocation = previousScrollLocation + window.innerHeight - dvhRemember
+    } else {
+        let parameter = Math.max(0, Math.min((previousScrollLocation - 2000) / dvhRemember, 11))
+        window.scrollTo(0, previousScrollLocation + window.innerHeight * parameter - dvhRemember * parameter)
+        previousScrollLocation = previousScrollLocation + window.innerHeight * parameter - dvhRemember * parameter
+    }
+    dvhRemember = window.innerHeight
+
     // menu trans enabling
     if (event.target.matchMedia("(width < 475px)")["matches"]) {
         setTimeout(() => { document.querySelector(".navigation-bar__menu").classList.add("trans") }, 500)
@@ -407,17 +418,6 @@ function Up(event) {
             }
         } catch { }
     }
-
-    // scroll dvh sync
-    if (dvhRemember <= previousScrollLocation && previousScrollLocation <= dvhRemember + 2000) {
-        window.scrollTo(0, previousScrollLocation + window.innerHeight - dvhRemember)
-        previousScrollLocation = previousScrollLocation + window.innerHeight - dvhRemember
-    } else {
-        let parameter = Math.max(0, Math.min((previousScrollLocation - 2000) / dvhRemember, 11))
-        window.scrollTo(0, previousScrollLocation + window.innerHeight * parameter - dvhRemember * parameter)
-        previousScrollLocation = previousScrollLocation + window.innerHeight * parameter - dvhRemember * parameter
-    }
-    dvhRemember = window.innerHeight
 }
 Up({ target: window })
 window.addEventListener("resize", Up)
