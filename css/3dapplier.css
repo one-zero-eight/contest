@@ -202,6 +202,7 @@ a {
     width: inherit !important;
     height: inherit !important;
     transition: all 500ms;
+    cursor: pointer;
 }
 
 .functions {
