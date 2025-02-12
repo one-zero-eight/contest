@@ -583,8 +583,12 @@ h3 {
 
     .functions_separated {
         flex-direction: column;
-        height: calc(100dvh - 2 * var(--panel-width));
+        height: calc(100dvh - var(--panel-width));
         margin-top: var(--panel-width);
+    }
+
+    #question {
+        margin-bottom: var(--panel-width);
     }
 
     .functions__function {
