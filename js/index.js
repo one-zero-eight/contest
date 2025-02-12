@@ -377,7 +377,7 @@ function burger() {
 }
 
 
-// Intersection observer
+// Intersection observers
 let intersectionObserver = new IntersectionObserver(events => {
     for (let event of events) {
         if (event.isIntersecting) {
@@ -388,6 +388,19 @@ let intersectionObserver = new IntersectionObserver(events => {
     }
 }, { root: null, rootMargin: "0px", threshold: 0 })
 intersectionObserver.observe(document.querySelector("h5"))
+
+let intersectionObserverContacts = new IntersectionObserver(events => {
+    for (let event of events) {
+        if (event.isIntersecting) {
+            document.querySelector("#tobottom").classList.add("text-link")
+            document.querySelector(".navigation-bar__menu__item").classList.remove("text-link")
+        } else {
+            document.querySelector("#tobottom").classList.remove("text-link")
+            document.querySelector(".navigation-bar__menu__item").classList.add("text-link")
+        }
+    }
+}, { root: null, rootMargin: "0px", threshold: 0 })
+intersectionObserverContacts.observe(document.querySelector("#contacts"))
 
 // css can't
 let dvhRemember = window.innerHeight
