@@ -58,7 +58,7 @@
         align-items: center;
         box-sizing: border-box;
         background-color: var(--bg);
-        overflow-x: hidden;
+        overflow-x: clip;
     }
 
     .navigation-bar-support {
@@ -129,7 +129,7 @@
     .background-1 {
         height: 100dvh;
         width: 100dvw;
-        overflow: hidden;
+        overflow: clip;
         position: absolute;
         transform-origin: top;
         animation: front-push linear forwards;
@@ -164,7 +164,7 @@
         justify-content: center;
         color: white;
         font: 500 100px/100px "Josefin Sans";
-        overflow: hidden;
+        overflow: clip;
         animation: transmit linear forwards;
         animation-timeline: view();
         animation-range-start: 100dvh;
@@ -1394,6 +1394,10 @@
                 font-size: 12px;
                 padding: 5px !important;
             }
+
+            .rounded-image-60 {
+                height: unset;
+            }
         }
 
         @media (height < 369px) {
@@ -1467,7 +1471,7 @@
         align-items: center;
         box-sizing: border-box;
         background-color: var(--bg);
-        overflow-x: hidden;
+        overflow-x: clip;
     }
 
     .navigation-bar-support {
@@ -1538,7 +1542,7 @@
     .background-1 {
         height: 100dvh;
         width: 100dvw;
-        overflow: hidden;
+        overflow: clip;
         position: absolute;
         transform-origin: top;
         /* animation: front-push linear forwards;
@@ -1573,7 +1577,7 @@
         justify-content: center;
         color: white;
         font: 500 100px/100px "Josefin Sans";
-        overflow: hidden;
+        overflow: clip;
         /* animation: transmit linear forwards;
     animation-timeline: view();
     animation-range-start: 100dvh;
@@ -2804,6 +2808,10 @@
             .button {
                 font-size: 12px;
                 padding: 5px !important;
+            }
+
+            .rounded-image-60 {
+                height: unset;
             }
         }
 
