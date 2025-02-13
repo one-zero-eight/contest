@@ -125,6 +125,7 @@ body {
 
 .grid {
     width: 100%;
+    max-width: 1200px;
     height: fit-content;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -135,7 +136,7 @@ body {
 
 .grid__placeholder-item {
     width: 100%;
-    max-width: 500px;
+    max-width: 600px;
     aspect-ratio: 1;
     background: linear-gradient(90deg, transparent, white, transparent);
     background-size: 200%;
