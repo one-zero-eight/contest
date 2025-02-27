@@ -59,7 +59,7 @@ for (let i of identifiers) {
 
     cameras[i].position.z = 150
     scenes[i].add(lights[i])
-    renderers[i].setSize(window.innerWidth < 800 ? 720 : 1920, window.innerWidth < 800 ? 720 : 1920)
+    renderers[i].setSize(1920, 1920)
     renderers[i].setClearColor(0x16161a, 0)
     renderers[i].setAnimationLoop(() => {
         renderers[i].render(scenes[i], cameras[i])
