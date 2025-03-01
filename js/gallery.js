@@ -1,4 +1,4 @@
-import * as THREE from "three"
+/*import * as THREE from "three"
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 
 const scenes = []
@@ -214,7 +214,7 @@ document.querySelector("#backward").addEventListener("click", () => {
         event = { target: renderers[difference % (sheetResponseBounded.length)].domElement }
     unexpand()
     expand(event)
-})
+})*/
 
 // burger
 document.querySelector(".burger").addEventListener("click", () => {
