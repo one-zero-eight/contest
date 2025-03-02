@@ -1,29 +1,23 @@
-/*import * as THREE from "three"
+import * as THREE from "three"
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 
-const scenes = []
-const cameras = []
-const renderers = []
-const loaders = []
-const lights = []
-
-let blobResponse = []
 let sheetResponseBounded = []
 let filesResponseBounded = []
+let filesResponseBoundedIterator
 
-let apiMessage = "Error occurred. Try to clear cache and reload this page"
+let apiMessage = "It looks like you have reloaded the page many times. Please wait a little while until we can response to your request."
 async function someBrowsersDoNotSupportGlobalAwaits() {
     let filesResponse
     let sheetResponse
 
     try {
-        filesResponse = await (await fetch("https://www.googleapis.com/drive/v3/files?q='1BHeR3ZdgC78LlmGCWX-VjlHYXkfbC0YVWngzeaQ5S5GXXUo5jMQicIOlS9hlYOyo0p4p2cXT'+in+parents&key=AIzaSyAaK_K5ZedO5Gez6qd45s--Djk8XyqeBBw")).json()
+        filesResponse = await (await fetch("https://www.googleapis.com/drive/v3/files?q='1BHeR3ZdgC78LlmGCWX-VjlHYXkfbC0YVWngzeaQ5S5GXXUo5jMQicIOlS9hlYOyo0p4p2cXT'+in+parents&key=AIzaSyBBpR5YqGFXgH77H5UCo1u3_q1GJFn1ISs")).json()
     } catch (e) {
         alert(apiMessage)
     }
 
     try {
-        sheetResponse = await (await fetch("https://sheets.googleapis.com/v4/spreadsheets/1zAAbzVA5-qK7UevrBGPiIJ0uHYu9wcegUK0pTES0JSw/values/Sheet1?key=AIzaSyAaK_K5ZedO5Gez6qd45s--Djk8XyqeBBw")).json()
+        sheetResponse = await (await fetch("https://sheets.googleapis.com/v4/spreadsheets/1zAAbzVA5-qK7UevrBGPiIJ0uHYu9wcegUK0pTES0JSw/values/Sheet1?key=AIzaSyBBpR5YqGFXgH77H5UCo1u3_q1GJFn1ISs")).json()
     } catch (e) {
         alert(apiMessage)
     }
@@ -41,180 +35,82 @@ async function someBrowsersDoNotSupportGlobalAwaits() {
         placeholder.classList.add("grid__placeholder-item")
         document.querySelector(".grid").appendChild(placeholder)
     }
-    
-    for (let [i, file] of filesResponseBounded.entries()) {
-        let response
-        try {
-            response = await (await fetch(`https://www.googleapis.com/drive/v3/files/${file["id"]}?key=AIzaSyAaK_K5ZedO5Gez6qd45s--Djk8XyqeBBw&alt=media`)).blob()
-        } catch (e) {
-            alert(apiMessage)
-        }
-        blobResponse.push(response)
-        try {
-            createModelWindow(i, blobResponse[i])
-        } catch (e) {
-            alert("Error occurred! Perhaps the information from the last submitted form had no time to be processed. Try to reload the page in a minute")
-        }
-        renderers[i].domElement.classList.add("grid__placeholder-item__viewer")
-        addEventListeners(renderers[i].domElement)
-        renderers[i].domElement.setAttribute("data-identifier", i)
-        document.querySelectorAll(".grid__placeholder-item")[i].appendChild(renderers[i].domElement)
-        document.querySelectorAll(".grid__placeholder-item")[i].style = "background: unset;"
-    }
 
+    filesResponseBoundedIterator = filesResponseBounded.entries()
+    createPreviews()
 }
 someBrowsersDoNotSupportGlobalAwaits()
-function createModelWindow(i, blobResponse) {
+
+let camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000)
+let renderer = new THREE.WebGLRenderer({ antialias: true })
+let loader = new GLTFLoader()
+let light = new THREE.HemisphereLight(0xffffff, 0x717173, 3)
+let material = new THREE.MeshStandardMaterial()
+camera.position.z = 100
+renderer.setSize(1200, 1200)
+async function createPreviews() {
+    let res = filesResponseBoundedIterator.next()
+    if (res.done)
+        return
+    let [i, file] = res.value
+    let blobResponse
+    try {
+        blobResponse = await (await fetch(`https://www.googleapis.com/drive/v3/files/${file["id"]}?key=AIzaSyBBpR5YqGFXgH77H5UCo1u3_q1GJFn1ISs&alt=media`)).blob()
+    } catch (e) {
+        alert(apiMessage)
+    }
+
+    renderer.setClearColor(sheetResponseBounded[i][1].length == 7 ?
+        parseInt(sheetResponseBounded[i][1].replace("#", ""), 16) : 0x16161a, 1)
     let forModel = sheetResponseBounded[i][0]
 
-    scenes.push(new THREE.Scene())
-    cameras.push(new THREE.PerspectiveCamera(75, 1, 0.1, 1000))
-    renderers.push(new THREE.WebGLRenderer({ antialias: true }))
-    loaders.push(new GLTFLoader())
-    lights.push(new THREE.HemisphereLight(0xffffff, 0x717173, 3))
-
-    loaders[i].load({
+    await loader.load({
         "T-Shirt": "/models/TShirt.glb",
         "Cap": "/models/Cap.glb",
         "Pants": "/models/Pants.glb",
         "Hoodie": "/models/Hoodie.glb"
     }[forModel], function (gltf) {
-        scenes[i].add(gltf.scene)
-        gltf.scene.traverse(o => {
+        gltf.scene.add(light)
+        const loadMeshTextureAndNormals = () => new Promise((resolve, reject) => {
+            const manager = new THREE.LoadingManager(() => resolve(textureAndNormals))
+            const textureAndNormals = [
+                (new THREE.TextureLoader(manager)).load(URL.createObjectURL(blobResponse)),
+                (new THREE.TextureLoader(manager)).load({
+                        "T-Shirt": "/images/T_TShirt_NL_8K.png",
+                        "Cap": "/images/T_Cap_NL_8K.png",
+                        "Pants": "/images/T_Pants_NL_8K.png",
+                        "Hoodie": "/images/T_Hoodie_NL_8K.png",
+                    }[forModel]),
+            ]
+        })
+        loadMeshTextureAndNormals().then(result => {
+            result[0].flipY = false
+            result[1].flipY = false
+            material.map = result[0]
+            material.normalMap = result[1]
+            gltf.scene.traverse(o => {
             if (o.isMesh) {
-                let texture = (new THREE.TextureLoader()).load(URL.createObjectURL(blobResponse))
-                texture.flipY = false
-                let normals = (new THREE.TextureLoader()).load({
-                    "T-Shirt": "/images/T_TShirt_NL_8K.png",
-                    "Cap": "/images/T_Cap_NL_8K.png",
-                    "Pants": "/images/T_Pants_NL_8K.png",
-                    "Hoodie": "/images/T_Hoodie_NL_8K.png",
-                }[forModel])
-                normals.flipY = false
-                o.material = new THREE.MeshStandardMaterial({ map: texture, normalMap: normals })
+                o.material = material
             }
+            })
+            renderer.clear()
+            renderer.render(gltf.scene, camera)
+            let copiedCanvas = document.createElement("canvas")
+            copiedCanvas.classList.add("wide")
+            copiedCanvas.setAttribute("width", 1200)
+            copiedCanvas.setAttribute("height", 1200)
+            copiedCanvas.getContext("2d").drawImage(renderer.domElement, 0, 0)
+            document.querySelectorAll(".grid__placeholder-item")[i].appendChild(copiedCanvas)
+            document.querySelectorAll(".grid__placeholder-item")[i].style = "background: unset;"
+            document.querySelectorAll(".grid__placeholder-item")[i].addEventListener("click", () => {
+                window.location.href = `https://contest.innohassle.ru/artwork.html?id=${filesResponseBounded[i]["id"]}`
+            })
+            createPreviews()
         })
     }, undefined, function (error) {
         console.error(error)
     })
-
-    cameras[i].position.z = 100
-    scenes[i].add(lights[i])
-    renderers[i].setSize(1920, 1920)
-    renderers[i].setClearColor(sheetResponseBounded[i][1].length == 7 ? parseInt(sheetResponseBounded[i][1].replace("#", ""), 16) : 0x16161a, 1)
-    renderers[i].setAnimationLoop(() => {
-        renderers[i].render(scenes[i], cameras[i])
-    })
 }
-
-let globalSensetivity = 1 / 100
-let sensetivity = 0
-// change the sensetivity
-document.querySelector("form").addEventListener("change", (event) => {
-    sensetivity = document.querySelector("#k").value / 1000
-    globalSensetivity = sensetivity
-})
-document.querySelector("#k").addEventListener("click", () => {
-    document.querySelector("#k").classList.toggle("none")
-})
-
-let previousTouchX = 0
-let previousTouchY = 0
-let previousTouchXX = null
-let previousTouchYY = null
-let scaleMode = false
-function addEventListeners(element) {
-    element.addEventListener("click", expand)
-
-    element.addEventListener("mousemove", event => {
-        if (event.buttons == 1) {
-            scenes[element.getAttribute("data-identifier")].rotation.y += event.movementX * sensetivity
-            scenes[element.getAttribute("data-identifier")].rotation.x += event.movementY * sensetivity
-        }
-    })
-    element.addEventListener("wheel", event => {
-        cameras[element.getAttribute("data-identifier")].position.z += event.deltaY * 5 * sensetivity
-    })
-
-    element.addEventListener("touchstart", (event) => {
-        previousTouchX = event.touches[0].screenX
-        previousTouchY = event.touches[0].screenY
-        if (event.touches.length > 1) {
-            scaleMode = true
-            previousTouchXX = event.touches[1].screenX
-            previousTouchYY = event.touches[1].screenY
-        }
-    })
-    element.addEventListener("touchmove", (event) => {
-        if (scaleMode) {
-            let delta = Math.sqrt((previousTouchX - previousTouchXX) ** 2 + (previousTouchY - previousTouchYY) ** 2)
-            delta -= Math.sqrt((event.touches[1].screenX - event.touches[0].screenX) ** 2 + (event.touches[1].screenY - event.touches[0].screenY) ** 2)
-            cameras[element.getAttribute("data-identifier")].position.z += delta * 25 * sensetivity
-            previousTouchXX = event.touches[1].screenX
-            previousTouchYY = event.touches[1].screenY
-        } else {
-            scenes[element.getAttribute("data-identifier")].rotation.y += (event.touches[0].screenX - previousTouchX) * sensetivity
-            scenes[element.getAttribute("data-identifier")].rotation.x += (event.touches[0].screenY - previousTouchY) * sensetivity
-        }
-        previousTouchX = event.touches[0].screenX
-        previousTouchY = event.touches[0].screenY
-    })
-    element.addEventListener("touchend", (event) => {
-        if (event.touches.length == 0) {
-            scaleMode = false
-        }
-    })
-}
-
-
-function expand(event) {
-    let i = event.target.getAttribute("data-identifier")
-    
-    document.querySelector("#get").setAttribute("href", URL.createObjectURL(blobResponse[i]))
-    document.querySelector("#get").setAttribute("download", `T_${sheetResponseBounded[i][0].replace("-", "")}_BC`)
-    // the length of the response is 1 time greater than actual response 
-    document.querySelector("#id").innerHTML = `#&nbsp;${sheetResponseBounded.length - 1 - event.target.getAttribute("data-identifier")}`
-    sensetivity = globalSensetivity
-    document.body.classList.add("hide-y-overflow")
-    event.target.removeEventListener("click", expand)
-    document.querySelector(".window").classList.toggle("transparent")
-    event.target.classList.add("grid__placeholder-item__viewer_big")
-    document.querySelector("#viewerplace").appendChild(event.target)
-}
-
-function unexpand() {
-    sensetivity = 0
-    document.body.classList.remove("hide-y-overflow")
-    let number = parseInt(document.querySelector("#id").textContent.replace("#", ""))
-    number = sheetResponseBounded.length - 1 - number
-    renderers[number].domElement.addEventListener("click", expand)
-    document.querySelector(".window").classList.toggle("transparent")
-    renderers[number].domElement.classList.remove("grid__placeholder-item__viewer_big")
-    let array = [...document.querySelectorAll(".grid__placeholder-item")]
-    array.filter(elem => elem.children.length == 0)[0].appendChild(renderers[number].domElement)
-}
-document.querySelector(".cross").addEventListener("click", unexpand)
-
-
-document.querySelector("#forward").addEventListener("click", () => {
-    let number = parseInt(document.querySelector("#id").textContent.replace("#", ""))
-    number = sheetResponseBounded.length - 1 - number
-    let event = { target: renderers[(number + 1) % (sheetResponseBounded.length)].domElement }
-    unexpand()
-    expand(event)
-})
-document.querySelector("#backward").addEventListener("click", () => {
-    let number = parseInt(document.querySelector("#id").textContent.replace("#", ""))
-    number = sheetResponseBounded.length - 1 - number
-    let difference = number - 1
-    let event
-    if (difference < 0)
-        event = { target: renderers[sheetResponseBounded.length - Math.abs(difference)].domElement }
-    else
-        event = { target: renderers[difference % (sheetResponseBounded.length)].domElement }
-    unexpand()
-    expand(event)
-})*/
 
 // burger
 document.querySelector(".burger").addEventListener("click", () => {

@@ -7,6 +7,7 @@ export default defineConfig({
                 index: "./index.html",
                 applier: "./3dapplier.html",
                 gallery: "./gallery.html",
+                artwork: "./artwork.html",
                 faq: "./faq.html",
                 four: "./404.html"
             }
