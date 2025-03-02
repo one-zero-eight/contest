@@ -48,11 +48,11 @@ a {
 :root {
     --bg: rgb(22, 22, 26);
     --bc: rgb(13, 13, 15);
-    --gap: 20px;
     --roundness: 40px;
     --vbox: 300px;
     --button-padding: 30px;
     --navigation-bar-height: 70px;
+    --gap: 5px;
 }
 
 body {
@@ -163,7 +163,7 @@ body {
     max-width: 1200px;
     height: fit-content;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: var(--gap);
     padding: var(--gap);
     box-sizing: border-box;
@@ -171,9 +171,9 @@ body {
 
 .grid__placeholder-item {
     width: 100%;
-    max-width: 600px;
+    cursor: pointer;
     aspect-ratio: 1;
-    background: linear-gradient(90deg, transparent, white, transparent);
+    background: linear-gradient(90deg, transparent, #6b6a70, transparent);
     background-size: 200%;
     background-repeat: no-repeat;
     animation: 1000ms glide linear infinite;
@@ -202,35 +202,9 @@ body {
     }
 }
 
-.window {
-    position: fixed;
-    width: 100dvw;
-    height: 100dvh;
-    background-color: var(--bc);
-    transition: opacity 500ms;
-    display: flex;
-    justify-content: center;
-}
-
 .font {
     font: 900 40px/35px "Roboto";
     color: white;
-}
-
-.window__vbox {
-    display: flex;
-    width: var(--vbox);
-    flex-direction: column;
-    justify-content: space-between;
-    padding: var(--gap) var(--gap)  var(--gap) 0;
-    max-width: 2560px;
-    max-height: 2560px;
-}
-
-.window__vbox + .window__vbox {
-    order: -1;
-    flex-grow: 1;
-    padding: var(--gap);
 }
 
 .button {
@@ -256,10 +230,6 @@ body {
 
 .sensetivity-label input {
     width: 100%;
-}
-
-.cross {
-    width: 35px;
 }
 
 .button-row {
@@ -314,11 +284,11 @@ body {
     font-family: "Josefin Sans";
 }
 
-@media (width < 1128px) {
-    .cross {
-        width: 20px;
-    }
+.wide {
+    width: 100%;
+}
 
+@media (width < 1128px) {
     .font {
         line-height: 20px;
         font-size: 25px;
@@ -348,10 +318,6 @@ body {
 }
 
 @media (width < 700px) and (height >= 300px) {
-    .cross {
-        margin-left: var(--gap);
-    }
-
     :root {
         --vbox: 90px;
     }
@@ -371,25 +337,6 @@ body {
         border-radius: 0;
         padding: 0;
         background-color: unset;
-    }
-
-    .window {
-        flex-direction: column;
-    }
-
-    .window__vbox {
-        width: 100%;
-        height: var(--vbox);
-        flex-direction: row;
-        padding: var(--gap);
-        align-items: center;
-    }
-
-    .window__vbox + .window__vbox {
-        padding: 0 var(--gap) var(--gap) var(--gap);
-        flex-direction: column;
-        order: unset;
-        align-items: unset;
     }
 
     .button-row {
@@ -416,7 +363,6 @@ body {
 
 @media (width < 452px) and (height >= 300px) {
     :root {
-        --gap: 10px;
         --vbox: 40px;
     }
 
@@ -457,15 +403,6 @@ body {
 }
 
 @media (height < 300px) {
-    .cross {
-        width: 20px;
-    }
-
-    .window__vbox + .window__vbox {
-        padding: 0;
-        transform: translateY(-20px);
-    }
-
     .font {
         line-height: 20px;
         font-size: 25px;
@@ -493,10 +430,6 @@ body {
         padding-right: 0;
     }
 
-    .window__vbox {
-        padding: 5px;
-    }
-
     .button {
         line-height: 16px;
         font-size: 12px;
@@ -505,6 +438,10 @@ body {
 }
 
 @media (width < 475px) {
+    .grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+
     .navigation-bar__menu {
         width: 100dvw;
         max-width: unset;
