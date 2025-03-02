@@ -141,6 +141,10 @@ body {
 
 /* modifiers */
 
+.background_unset {
+    background: unset;
+}
+
 .top-100 {
     transform: translateY(0%) !important;
 }
