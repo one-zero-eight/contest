@@ -4,20 +4,30 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 let sheetResponseBounded = []
 let filesResponseBounded = []
 
+let apiKeys = [
+    ["AIzaSyAaK_K5ZedO5Gez6qd45s--Djk8XyqeBBw", true],
+    ["AIzaSyD15tvXajAu0P9GGQjai-DZrja8MbMx_JE", true],
+    ["AIzaSyB6qB-I7tdy9IIX1btiWmJ--xqT7uKBYtE", true],
+    ["AIzaSyAqVX_uG29dogcreKtW6cSLVyiHQOqefgw", true],
+    ["AIzaSyCkPuFIZUvas34L1pM42-iEAwzewMv_54U", true],
+    ["AIzaSyBBpR5YqGFXgH77H5UCo1u3_q1GJFn1ISs", true]
+
+]
+
 let apiMessage = "It looks like you have reloaded the page many times. Please wait a little while until we can response to your request."
 async function someBrowsersDoNotSupportGlobalAwaits() {
     let filesResponse
     let sheetResponse
 
     try {
-        filesResponse = await (await fetch("https://www.googleapis.com/drive/v3/files?q='1BHeR3ZdgC78LlmGCWX-VjlHYXkfbC0YVWngzeaQ5S5GXXUo5jMQicIOlS9hlYOyo0p4p2cXT'+in+parents&key=AIzaSyAaK_K5ZedO5Gez6qd45s--Djk8XyqeBBw")).json()
+        filesResponse = await (await fetch(`https://www.googleapis.com/drive/v3/files?q='1BHeR3ZdgC78LlmGCWX-VjlHYXkfbC0YVWngzeaQ5S5GXXUo5jMQicIOlS9hlYOyo0p4p2cXT'+in+parents&key=${apiKeys[0][0]}`)).json()
     } catch (e) {
         alert(apiMessage)
         return
     }
 
     try {
-        sheetResponse = await (await fetch("https://sheets.googleapis.com/v4/spreadsheets/1zAAbzVA5-qK7UevrBGPiIJ0uHYu9wcegUK0pTES0JSw/values/Sheet1?key=AIzaSyAaK_K5ZedO5Gez6qd45s--Djk8XyqeBBw")).json()
+        sheetResponse = await (await fetch(`https://sheets.googleapis.com/v4/spreadsheets/1zAAbzVA5-qK7UevrBGPiIJ0uHYu9wcegUK0pTES0JSw/values/Sheet1?key=${apiKeys[0][0]}`)).json()
     } catch (e) {
         alert(apiMessage)
         return
@@ -26,9 +36,15 @@ async function someBrowsersDoNotSupportGlobalAwaits() {
 
     let requestedArtworkId = (new URLSearchParams(document.location.search)).get("id")
     let currentImage
-    try {
-        currentImage = await (await fetch(`https://www.googleapis.com/drive/v3/files/${requestedArtworkId}?key=AIzaSyAaK_K5ZedO5Gez6qd45s--Djk8XyqeBBw&alt=media`)).blob()
-    } catch (e) {
+    while (apiKeys[0][1])
+        try {
+            currentImage = await (await fetch(`https://www.googleapis.com/drive/v3/files/${requestedArtworkId}?key=${apiKeys[0][0]}&alt=media`)).blob()
+        } catch (e) {
+            apiKeys.unshift(apiKeys.pop())
+        }
+    if (!apiKeys[0][1]) {
+        for (let elem of apiKeys)
+            elem[1] = true
         alert(apiMessage)
         return
     }
