@@ -6,41 +6,6 @@
     user-select: none;
 }
 
-.loading {
-    padding: 20px;
-    box-sizing: border-box;
-    width: 100dvw;
-    overflow-y: auto;
-    overflow-x: hidden;
-    height: calc(100dvh - var(--navigation-bar-height));
-    top: var(--navigation-bar-height);
-    background: rgba(0, 0, 0, 0.85);
-    text-align: center;
-    position: fixed;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    z-index: 1000;
-}
-
-.loading__image {
-    margin: 20px;
-    width: 250px;
-    border-radius: 20px;
-}
-
-.figure__text {
-    font: 500 40px/50px "Roboto";
-    color: white;
-}
-
-.bottom-subfont {
-        font: 400 16px/30px "Roboto";
-        color: white;
-        text-align: center;
-    }
-
 a {
     text-decoration: none;
 }
@@ -238,7 +203,7 @@ body {
 
 .button-row .button {
     border-radius: var(--button-padding) 0 0 var(--button-padding);
-    padding: var(--button-padding) 5px var(--button-padding) var(--button-padding); 
+    padding: var(--button-padding) 5px var(--button-padding) var(--button-padding);
 }
 
 .button-row .button + .button {
