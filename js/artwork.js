@@ -105,6 +105,7 @@ function createView(blobResponse, id) {
                     o.material = material
                 }
             })
+            document.querySelector(".viewerplace").style.background = "unset;"
         })
     }, undefined, function (error) {
         console.error(error)
