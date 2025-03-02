@@ -71,13 +71,13 @@ async function createPreviews() {
             blobResponse = await (await fetch(`https://www.googleapis.com/drive/v3/files/${file["id"]}?key=${apiKeys[0][0]}&alt=media`)).blob()
             break
         } catch (e) {
+            changeVariant()
             apiKeys[0][1] = false
             apiKeys.unshift(apiKeys.pop())
         }
     if (!apiKeys[0][1]) {
         for (let elem of apiKeys)
             elem[1] = true
-        alert(apiMessage)
         return
     }
 
@@ -138,3 +138,25 @@ document.querySelector(".burger").addEventListener("click", () => {
     document.querySelector(".burger__line-1").classList.toggle("burger__line-1_full")
     document.querySelector(".navigation-bar__menu").classList.toggle("top-100")
 })
+
+let loadingOpacity = 1
+function loadingGradualDisappearing() {
+    loadingOpacity -= 0.01
+    loadingOpacity = Math.max(loadingOpacity, 0)
+    document.querySelector(".loading").style.opacity = loadingOpacity
+    setTimeout(loadingGradualDisappearing, 100)
+}
+loadingGradualDisappearing()
+
+let variant = 1
+function changeVariant() {
+    variant += 1
+    if (variant == 7) {
+        document.querySelector(".figure__text").textContent = `The gallery is unavailable now`
+        document.querySelector(".bottom-subfont").textContent = `You will be redirected to the previous page in 5 seconds.`
+        setTimeout(() => { history.back() }, 5000)
+    }
+    else
+        document.querySelector(".figure__text").textContent = `Variant ${variant}`
+    loadingOpacity = 1
+}
