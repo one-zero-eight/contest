@@ -69,7 +69,9 @@ async function createPreviews() {
     while (apiKeys[0][1])
         try {
             blobResponse = await (await fetch(`https://www.googleapis.com/drive/v3/files/${file["id"]}?key=${apiKeys[0][0]}&alt=media`)).blob()
+            break
         } catch (e) {
+            apiKeys[0][1] = false
             apiKeys.unshift(apiKeys.pop())
         }
     if (!apiKeys[0][1]) {
