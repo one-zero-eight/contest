@@ -57,7 +57,11 @@ async function someBrowsersDoNotSupportGlobalAwaits() {
                 continue
 
             let previousIndex = i > 0 ? i - 1 : filesResponse["files"].length - 1
+            while (sheetResponse["values"][previousIndex].length != 3 || sheetResponse["values"][previousIndex][0] == "For which model is this texture for?")
+                previousIndex = previousIndex > 0 ? previousIndex - 1 : filesResponse["files"].length - 1
             let nextIndex = i < filesResponse["files"].length - 1 ? i + 1 : 0
+            while (sheetResponse["values"][nextIndex].length != 3 || sheetResponse["values"][nextIndex][0] == "For which model is this texture for?")
+                nextIndex = nextIndex < filesResponse["files"].length - 1 ? nextIndex + 1 : 0
             sheetResponseBounded.push(sheetResponse["values"][previousIndex])
             filesResponseBounded.push(filesResponse["files"][previousIndex])
             sheetResponseBounded.push(sheetResponse["values"][i])
