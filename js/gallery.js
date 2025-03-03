@@ -157,6 +157,6 @@ function changeVariant() {
         setTimeout(() => { history.back() }, 5000)
     }
     else
-        document.querySelector(".figure__text").textContent = `Variant ${variant}`
+        document.querySelector(".figure__text").textContent = `Loading: Variant ${variant}`
     loadingOpacity = 1
 }
