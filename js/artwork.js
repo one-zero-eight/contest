@@ -4,51 +4,82 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 let sheetResponseBounded = []
 let filesResponseBounded = []
 
-let apiKeys = [
-    ["AIzaSyAaK_K5ZedO5Gez6qd45s--Djk8XyqeBBw", true],
-    ["AIzaSyD15tvXajAu0P9GGQjai-DZrja8MbMx_JE", true],
-    ["AIzaSyB6qB-I7tdy9IIX1btiWmJ--xqT7uKBYtE", true],
-    ["AIzaSyAqVX_uG29dogcreKtW6cSLVyiHQOqefgw", true],
-    ["AIzaSyCkPuFIZUvas34L1pM42-iEAwzewMv_54U", true],
-    ["AIzaSyBBpR5YqGFXgH77H5UCo1u3_q1GJFn1ISs", true]
+let apiKey = "AIzaSyAaK_K5ZedO5Gez6qd45s--Djk8XyqeBBw"
 
-]
-
-let apiMessage = "It looks like you have reloaded the page many times. Please wait a little while until we can response to your request."
 async function someBrowsersDoNotSupportGlobalAwaits() {
+    let responseAwaits = 1
+
     let filesResponse
     let sheetResponse
 
-    try {
-        filesResponse = await (await fetch(`https://www.googleapis.com/drive/v3/files?q='1BHeR3ZdgC78LlmGCWX-VjlHYXkfbC0YVWngzeaQ5S5GXXUo5jMQicIOlS9hlYOyo0p4p2cXT'+in+parents&key=${apiKeys[0][0]}`)).json()
-    } catch (e) {
-        alert(apiMessage)
-        return
+    while (true) {
+        filesResponse = await fetch(`https://www.googleapis.com/drive/v3/files?q='1BHeR3ZdgC78LlmGCWX-VjlHYXkfbC0YVWngzeaQ5S5GXXUo5jMQicIOlS9hlYOyo0p4p2cXT'+in+parents&key=${apiKey}`)
+        if (filesResponse["status"] == 200) {
+            filesResponse = await filesResponse.json()
+            break
+        } else {
+            responseAwaits += 1
+            let time = 2 ** responseAwaits * 1000 + Math.random() * 1000
+            changeVariant(time)
+            await new Promise(resolve => setTimeout(resolve, time))
+        }
     }
 
-    try {
-        sheetResponse = await (await fetch(`https://sheets.googleapis.com/v4/spreadsheets/1zAAbzVA5-qK7UevrBGPiIJ0uHYu9wcegUK0pTES0JSw/values/Sheet1?key=${apiKeys[0][0]}`)).json()
-    } catch (e) {
-        alert(apiMessage)
-        return
+    responseAwaits = 1
+
+    while (true) {
+        sheetResponse = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/1zAAbzVA5-qK7UevrBGPiIJ0uHYu9wcegUK0pTES0JSw/values/Sheet1?key=${apiKey}`)
+        if (sheetResponse["status"] == 200) {
+            sheetResponse = await sheetResponse.json()
+            break
+        } else {
+            responseAwaits += 1
+            let time = 2 ** responseAwaits * 1000 + Math.random() * 1000
+            changeVariant(time)
+            await new Promise(resolve => setTimeout(resolve, time))
+        }
     }
     sheetResponse["values"].reverse()
 
+    responseAwaits = 1
+
     let requestedArtworkId = (new URLSearchParams(document.location.search)).get("id")
-    let currentImage
-    while (apiKeys[0][1])
-        try {
-            currentImage = await (await fetch(`https://www.googleapis.com/drive/v3/files/${requestedArtworkId}?key=${apiKeys[0][0]}&alt=media`)).blob()
+
+    let thumbnailResponse
+    while (true) {
+        thumbnailResponse = await fetch(`https://www.googleapis.com/drive/v3/files/${requestedArtworkId}?fields=thumbnailLink&key=${apiKey}`)
+        if (thumbnailResponse["status"] == 200) {
+            thumbnailResponse = await thumbnailResponse.json()
             break
-        } catch (e) {
-            apiKeys[0][1] = false
-            apiKeys.unshift(apiKeys.pop())
+        } else {
+            responseAwaits += 1
+            let time = 2 ** responseAwaits * 1000 + Math.random() * 1000
+            changeVariant(time)
+            await new Promise(resolve => setTimeout(resolve, time))
         }
-    if (!apiKeys[0][1]) {
-        for (let elem of apiKeys)
-            elem[1] = true
-        alert(apiMessage)
-        return
+    }
+    thumbnailResponse.thumbnailLink = thumbnailResponse["thumbnailLink"].slice(0, thumbnailResponse["thumbnailLink"].indexOf("=s")) + "=s1920"
+
+    responseAwaits = 1
+
+    let currentImage
+    while (true) {
+        currentImage = (await fetch(`${thumbnailResponse["thumbnailLink"]}`))
+        if (currentImage["status"] == 200) {
+            currentImage = await currentImage.blob()
+            break
+        } else {
+            currentImage = await fetch(`https://www.googleapis.com/drive/v3/files/${requestedArtworkId}?key=${apiKey}&alt=media`)
+            if (currentImage["status"] == 200) {
+                currentImage = await currentImage.blob()
+                break
+            } else {
+                responseAwaits += 1
+                let time = 2 ** responseAwaits * 1000 + Math.random() * 1000
+                changeVariant(time)
+                await new Promise(resolve => setTimeout(resolve, time))
+            }
+        }
     }
 
     for (let [i, elem] of sheetResponse["values"].entries()) {
@@ -70,11 +101,6 @@ async function someBrowsersDoNotSupportGlobalAwaits() {
             filesResponseBounded.push(filesResponse["files"][nextIndex])
             break
         }
-    }
-
-    if (sheetResponseBounded.length == 0) {
-        alert(apiMessage)
-        return
     }
 
     createView(currentImage, requestedArtworkId)
@@ -206,3 +232,18 @@ document.querySelector("#forward").addEventListener("click", () => {
 document.querySelector("#backward").addEventListener("click", () => {
     window.location.href = `https://contest.innohassle.ru/artwork.html?id=${filesResponseBounded[0]["id"]}`
 })
+
+let loadingOpacity = 1
+function loadingGradualDisappearing() {
+    loadingOpacity -= 0.01
+    loadingOpacity = Math.max(loadingOpacity, 0)
+    document.querySelector(".loading").style.opacity = loadingOpacity
+    setTimeout(loadingGradualDisappearing, 100)
+}
+loadingGradualDisappearing()
+
+function changeVariant(time) {
+    document.querySelector(".figure__text").textContent = `The request for artworks is unsuccessful`
+    document.querySelector(".bottom-subfont").textContent = `We are going to try again in ${Math.round(time / 1000)} seconds`
+    loadingOpacity = 1
+}

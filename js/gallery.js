@@ -5,35 +5,44 @@ let sheetResponseBounded = []
 let filesResponseBounded = []
 let filesResponseBoundedIterator
 
-let apiKeys = [
-    ["AIzaSyAaK_K5ZedO5Gez6qd45s--Djk8XyqeBBw", true],
-    ["AIzaSyD15tvXajAu0P9GGQjai-DZrja8MbMx_JE", true],
-    ["AIzaSyB6qB-I7tdy9IIX1btiWmJ--xqT7uKBYtE", true],
-    ["AIzaSyAqVX_uG29dogcreKtW6cSLVyiHQOqefgw", true],
-    ["AIzaSyCkPuFIZUvas34L1pM42-iEAwzewMv_54U", true],
-    ["AIzaSyBBpR5YqGFXgH77H5UCo1u3_q1GJFn1ISs", true]
+let apiKey = "AIzaSyAaK_K5ZedO5Gez6qd45s--Djk8XyqeBBw"
 
-]
-
-let apiMessage = "It looks like you have reloaded the page many times. Please wait a little while until we can response to your request."
 async function someBrowsersDoNotSupportGlobalAwaits() {
+    let responseAwaits = 1
+
     let filesResponse
     let sheetResponse
 
-    try {
-        filesResponse = await (await fetch(`https://www.googleapis.com/drive/v3/files?q='1BHeR3ZdgC78LlmGCWX-VjlHYXkfbC0YVWngzeaQ5S5GXXUo5jMQicIOlS9hlYOyo0p4p2cXT'+in+parents&key=${apiKeys[0][0]}`)).json()
-    } catch (e) {
-        alert(apiMessage)
-        return
+    while (true) {
+        filesResponse = await fetch(`https://www.googleapis.com/drive/v3/files?q='1BHeR3ZdgC78LlmGCWX-VjlHYXkfbC0YVWngzeaQ5S5GXXUo5jMQicIOlS9hlYOyo0p4p2cXT'+in+parents&key=${apiKey}`)
+        if (filesResponse["status"] == 200) {
+            filesResponse = await filesResponse.json()
+            break
+        } else {
+            responseAwaits += 1
+            let time = 2 ** responseAwaits * 1000 + Math.random() * 1000
+            changeVariant(time)
+            await new Promise(resolve => setTimeout(resolve, time))
+        }
     }
 
-    try {
-        sheetResponse = await (await fetch(`https://sheets.googleapis.com/v4/spreadsheets/1zAAbzVA5-qK7UevrBGPiIJ0uHYu9wcegUK0pTES0JSw/values/Sheet1?key=${apiKeys[0][0]}`)).json()
-    } catch (e) {
-        alert(apiMessage)
-        return
+    responseAwaits = 1
+
+    while (true) {
+        sheetResponse = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/1zAAbzVA5-qK7UevrBGPiIJ0uHYu9wcegUK0pTES0JSw/values/Sheet1?key=${apiKey}`)
+        if (sheetResponse["status"] == 200) {
+            sheetResponse = await sheetResponse.json()
+            break
+        } else {
+            responseAwaits += 1
+            let time = 2 ** responseAwaits * 1000 + Math.random() * 1000
+            changeVariant(time)
+            await new Promise(resolve => setTimeout(resolve, time))
+        }
     }
     sheetResponse["values"].reverse()
+
+    responseAwaits = 1
 
     for (let [i, elem] of sheetResponse["values"].entries()) {
         if (elem.length == 3 && elem[0] != "For which model is this texture for?") {
@@ -43,6 +52,23 @@ async function someBrowsersDoNotSupportGlobalAwaits() {
     }
 
     for (let elem of filesResponseBounded) {
+        let thumbnailResponse
+        while (true) {
+            thumbnailResponse = await fetch(`https://www.googleapis.com/drive/v3/files/${elem["id"]}?fields=thumbnailLink&key=${apiKey}`)
+            if (thumbnailResponse["status"] == 200) {
+                thumbnailResponse = await thumbnailResponse.json()
+                break
+            } else {
+                responseAwaits += 1
+                let time = 2 ** responseAwaits * 1000 + Math.random() * 1000
+                changeVariant(time)
+                await new Promise(resolve => setTimeout(resolve, time))
+            }
+        }
+        elem.thumbnailLink = thumbnailResponse["thumbnailLink"].slice(0, thumbnailResponse["thumbnailLink"].indexOf("=s")) + "=s1920"
+
+        responseAwaits = 1
+
         let placeholder = document.createElement("div")
         placeholder.classList.add("grid__placeholder-item")
         document.querySelector(".grid").appendChild(placeholder)
@@ -65,20 +91,27 @@ async function createPreviews() {
     if (res.done)
         return
     let [i, file] = res.value
+
+    let responseAwaits = 1
+
     let blobResponse
-    while (apiKeys[0][1])
-        try {
-            blobResponse = await (await fetch(`https://www.googleapis.com/drive/v3/files/${file["id"]}?key=${apiKeys[0][0]}&alt=media`)).blob()
+    while (true) {
+        blobResponse = (await fetch(`${file["thumbnailLink"]}`))
+        if (blobResponse["status"] == 200) {
+            blobResponse = await blobResponse.blob()
             break
-        } catch (e) {
-            changeVariant()
-            apiKeys[0][1] = false
-            apiKeys.unshift(apiKeys.pop())
+        } else {
+            blobResponse = await fetch(`https://www.googleapis.com/drive/v3/files/${file["id"]}?key=${apiKey}&alt=media`)
+            if (blobResponse["status"] == 200) {
+                blobResponse = await blobResponse.blob()
+                break
+            } else {
+                responseAwaits += 1
+                let time = 2 ** responseAwaits * 1000 + Math.random() * 1000
+                changeVariant(time)
+                await new Promise(resolve => setTimeout(resolve, time))
+            }
         }
-    if (!apiKeys[0][1]) {
-        for (let elem of apiKeys)
-            elem[1] = true
-        return
     }
 
     renderer.setClearColor(sheetResponseBounded[i][1].length == 7 ?
@@ -148,15 +181,8 @@ function loadingGradualDisappearing() {
 }
 loadingGradualDisappearing()
 
-let variant = 1
-function changeVariant() {
-    variant += 1
-    if (variant == 7) {
-        document.querySelector(".figure__text").textContent = `The gallery is unavailable now`
-        document.querySelector(".bottom-subfont").textContent = `You will be redirected to the previous page in 5 seconds.`
-        setTimeout(() => { history.back() }, 5000)
-    }
-    else
-        document.querySelector(".figure__text").textContent = `Loading: Variant ${variant}`
+function changeVariant(time) {
+    document.querySelector(".figure__text").textContent = `The request for artworks is unsuccessful`
+    document.querySelector(".bottom-subfont").textContent = `We are going to try again in ${Math.round(time / 1000)} seconds`
     loadingOpacity = 1
 }
