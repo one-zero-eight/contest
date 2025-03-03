@@ -39,7 +39,8 @@
 
 .figure__text {
     font: 500 40px/50px "Roboto";
-    width: 40%;
+    text-align: center;
+    width: 90%;
     color: white;
 }
 
