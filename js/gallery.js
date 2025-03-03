@@ -122,7 +122,7 @@ async function createPreviews() {
             copiedCanvas.setAttribute("height", 1200)
             copiedCanvas.getContext("2d").drawImage(renderer.domElement, 0, 0)
             document.querySelectorAll(".grid__placeholder-item")[i].appendChild(copiedCanvas)
-            document.querySelectorAll(".grid__placeholder-item")[i].style = "background: unset;"
+            document.querySelectorAll(".grid__placeholder-item")[i].style = "background: unset; aspect-ratio: unset;"
             document.querySelectorAll(".grid__placeholder-item")[i].addEventListener("click", () => {
                 window.location.href = `https://contest.innohassle.ru/artwork.html?id=${filesResponseBounded[i]["id"]}`
             })
