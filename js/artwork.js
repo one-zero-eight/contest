@@ -238,7 +238,7 @@ function loadingGradualDisappearing() {
     loadingOpacity -= 0.01
     loadingOpacity = Math.max(loadingOpacity, 0)
     document.querySelector(".loading").style.opacity = loadingOpacity
-    setTimeout(loadingGradualDisappearing, 100)
+    setTimeout(loadingGradualDisappearing, 20)
 }
 loadingGradualDisappearing()
 
