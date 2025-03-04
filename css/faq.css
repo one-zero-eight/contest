@@ -93,16 +93,19 @@ body {
     width: 100%;
     background-color: white;
     transition: all 500ms;
+    border-radius: 4px;
 }
 
 .burger__line-1_full {
     height: 90%;
+    border-radius: 4px 4px 0 0;
 }
 
 .burger__line-2 {
-    height: 10%;
+    height: 15%;
     width: 100%;
     background-color: white;
+    border-radius: 4px;
 }
 
 .navigation-bar__menu__item {
