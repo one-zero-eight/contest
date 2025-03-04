@@ -65,7 +65,7 @@ async function someBrowsersDoNotSupportGlobalAwaits() {
                 await new Promise(resolve => setTimeout(resolve, time))
             }
         }
-        elem.thumbnailLink = thumbnailResponse["thumbnailLink"].slice(0, thumbnailResponse["thumbnailLink"].indexOf("=s")) + "=s1920"
+        elem.thumbnailLink = thumbnailResponse["thumbnailLink"].slice(0, thumbnailResponse["thumbnailLink"].indexOf("=s")) + "=s600"
 
         responseAwaits = 1
 
