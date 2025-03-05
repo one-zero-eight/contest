@@ -82,30 +82,48 @@ async function someBrowsersDoNotSupportGlobalAwaits() {
         }
     }
 
-    for (let [i, elem] of sheetResponse["values"].entries()) {
-        if (elem.length == 3 && elem[0] != "For which model is this texture for?") {
-            if (filesResponse["files"][i]["id"] != requestedArtworkId)
-                continue
-
-            let previousIndex = i > 0 ? i - 1 : filesResponse["files"].length - 1
-            while (sheetResponse["values"][previousIndex].length != 3 || sheetResponse["values"][previousIndex][0] == "For which model is this texture for?")
-                previousIndex = previousIndex > 0 ? previousIndex - 1 : filesResponse["files"].length - 1
-            let nextIndex = i < filesResponse["files"].length - 1 ? i + 1 : 0
-            while (sheetResponse["values"][nextIndex].length != 3 || sheetResponse["values"][nextIndex][0] == "For which model is this texture for?")
-                nextIndex = nextIndex < filesResponse["files"].length - 1 ? nextIndex + 1 : 0
-            sheetResponseBounded.push(sheetResponse["values"][previousIndex])
-            filesResponseBounded.push(filesResponse["files"][previousIndex])
-            sheetResponseBounded.push(sheetResponse["values"][i])
-            filesResponseBounded.push(filesResponse["files"][i])
-            sheetResponseBounded.push(sheetResponse["values"][nextIndex])
-            filesResponseBounded.push(filesResponse["files"][nextIndex])
-            break
+    let bitmap = await window.createImageBitmap(currentImage)
+    let manipulativeCanvas = document.createElement("canvas")
+    manipulativeCanvas.setAttribute("width", bitmap.width)
+    manipulativeCanvas.setAttribute("height", bitmap.height)
+    let context = manipulativeCanvas.getContext("2d")
+    context.drawImage(bitmap, 0, 0)
+    let imageData = context.getImageData(0, 0, bitmap.width, bitmap.height)
+    let data = imageData.data
+    for (let i = 0; i < data.length; i += 4) {
+        if (data[i] < 3 && data[i + 1] < 3 && data[i + 2] < 3) {
+            data[i] = data[i + 1] = data[i + 2] = 3
         }
     }
+    context.putImageData(imageData, 0, 0)
+    manipulativeCanvas.toBlob(currentImage => {
 
-    createView(currentImage, requestedArtworkId)
-    document.querySelector("#get").setAttribute("href", URL.createObjectURL(currentImage))
-    document.querySelector("#get").setAttribute("download", `T_${sheetResponseBounded[1][0].replace("-", "")}_BC`)
+        for (let [i, elem] of sheetResponse["values"].entries()) {
+            if (elem.length == 3 && elem[0] != "For which model is this texture for?") {
+                if (filesResponse["files"][i]["id"] != requestedArtworkId)
+                    continue
+
+                let previousIndex = i > 0 ? i - 1 : filesResponse["files"].length - 1
+                while (sheetResponse["values"][previousIndex].length != 3 || sheetResponse["values"][previousIndex][0] == "For which model is this texture for?")
+                    previousIndex = previousIndex > 0 ? previousIndex - 1 : filesResponse["files"].length - 1
+                let nextIndex = i < filesResponse["files"].length - 1 ? i + 1 : 0
+                while (sheetResponse["values"][nextIndex].length != 3 || sheetResponse["values"][nextIndex][0] == "For which model is this texture for?")
+                    nextIndex = nextIndex < filesResponse["files"].length - 1 ? nextIndex + 1 : 0
+                sheetResponseBounded.push(sheetResponse["values"][previousIndex])
+                filesResponseBounded.push(filesResponse["files"][previousIndex])
+                sheetResponseBounded.push(sheetResponse["values"][i])
+                filesResponseBounded.push(filesResponse["files"][i])
+                sheetResponseBounded.push(sheetResponse["values"][nextIndex])
+                filesResponseBounded.push(filesResponse["files"][nextIndex])
+                break
+            }
+        }
+
+        createView(currentImage, requestedArtworkId)
+        document.querySelector("#get").setAttribute("href", URL.createObjectURL(currentImage))
+        document.querySelector("#get").setAttribute("download", `T_${sheetResponseBounded[1][0].replace("-", "")}_BC`)
+        manipulativeCanvas.remove()
+    })
 }
 someBrowsersDoNotSupportGlobalAwaits()
 addEventListeners()
@@ -136,11 +154,11 @@ function createView(blobResponse, id) {
             const textureAndNormals = [
                 (new THREE.TextureLoader(manager)).load(URL.createObjectURL(blobResponse)),
                 (new THREE.TextureLoader(manager)).load({
-                        "T-Shirt": "/images/T_TShirt_NL_8K.png",
-                        "Cap": "/images/T_Cap_NL_8K.png",
-                        "Pants": "/images/T_Pants_NL_8K.png",
-                        "Hoodie": "/images/T_Hoodie_NL_8K.png",
-                    }[forModel]),
+                    "T-Shirt": "/images/T_TShirt_NL_8K.png",
+                    "Cap": "/images/T_Cap_NL_8K.png",
+                    "Pants": "/images/T_Pants_NL_8K.png",
+                    "Hoodie": "/images/T_Hoodie_NL_8K.png",
+                }[forModel]),
             ]
         })
         loadMeshTextureAndNormals().then(result => {
