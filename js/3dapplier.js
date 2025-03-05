@@ -175,20 +175,37 @@ document.addEventListener("wheel", event => {
 })
 
 // change the texture
-document.querySelector("form").addEventListener("change", () => {
+document.querySelector("form").addEventListener("change", async () => {
     let reader = new FileReader()
-    reader.readAsDataURL(document.querySelector("input").files[0])
-    reader.onload = (e) => {
-        let textureLoader = new THREE.TextureLoader()
-        let texture = textureLoader.load(e.target.result)
-        texture.flipY = false
-        models[currentModelIdentifier].traverse(o => {
-            if (o.isMesh) {
-                o.material.map = texture
-            }
-        })
+    let bitmap = await window.createImageBitmap(document.querySelector("input").files[0])
+    let manipulativeCanvas = document.createElement("canvas")
+    manipulativeCanvas.setAttribute("width", bitmap.width)
+    manipulativeCanvas.setAttribute("height", bitmap.height)
+    let context = manipulativeCanvas.getContext("2d")
+    context.drawImage(bitmap, 0, 0)
+    let imageData = context.getImageData(0, 0, bitmap.width, bitmap.height)
+    let data = imageData.data
+    for (let i = 0; i < data.length; i += 4) {
+        if (data[i] < 3 && data[i + 1] < 3 && data[i + 2] < 3) {
+            data[i] = data[i + 1] = data[i + 2] = 3
+        }
     }
-    document.querySelector("form").reset()
+    context.putImageData(imageData, 0, 0)
+    manipulativeCanvas.toBlob(blob => {
+        reader.readAsDataURL(blob)
+        reader.onload = (e) => {
+            let textureLoader = new THREE.TextureLoader()
+            let texture = textureLoader.load(e.target.result)
+            texture.flipY = false
+            models[currentModelIdentifier].traverse(o => {
+                if (o.isMesh) {
+                    o.material.map = texture
+                }
+            })
+        }
+        document.querySelector("form").reset()
+        manipulativeCanvas.remove()
+    })
 })
 // change the color
 document.querySelectorAll("form")[1].addEventListener("change", (event) => {

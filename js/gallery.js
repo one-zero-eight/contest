@@ -114,55 +114,72 @@ async function createPreviews() {
         }
     }
 
-    renderer.setClearColor(sheetResponseBounded[i][1].length == 7 ?
-        parseInt(sheetResponseBounded[i][1].replace("#", ""), 16) : 0x16161a, 1)
-    let forModel = sheetResponseBounded[i][0]
+    let bitmap = await window.createImageBitmap(blobResponse)
+    let manipulativeCanvas = document.createElement("canvas")
+    manipulativeCanvas.setAttribute("width", bitmap.width)
+    manipulativeCanvas.setAttribute("height", bitmap.height)
+    let context = manipulativeCanvas.getContext("2d")
+    context.drawImage(bitmap, 0, 0)
+    let imageData = context.getImageData(0, 0, bitmap.width, bitmap.height)
+    let data = imageData.data
+    for (let i = 0; i < data.length; i += 4) {
+        if (data[i] < 3 && data[i + 1] < 3 && data[i + 2] < 3) {
+            data[i] = data[i + 1] = data[i + 2] = 3
+        }
+    }
+    context.putImageData(imageData, 0, 0)
+    manipulativeCanvas.toBlob(blobResponse => {
+        renderer.setClearColor(sheetResponseBounded[i][1].length == 7 ?
+            parseInt(sheetResponseBounded[i][1].replace("#", ""), 16) : 0x16161a, 1)
+        let forModel = sheetResponseBounded[i][0]
 
-    await loader.load({
-        "T-Shirt": "/models/TShirt.glb",
-        "Cap": "/models/Cap.glb",
-        "Pants": "/models/Pants.glb",
-        "Hoodie": "/models/Hoodie.glb"
-    }[forModel], function (gltf) {
-        gltf.scene.add(light)
-        const loadMeshTextureAndNormals = () => new Promise((resolve, reject) => {
-            const manager = new THREE.LoadingManager(() => resolve(textureAndNormals))
-            const textureAndNormals = [
-                (new THREE.TextureLoader(manager)).load(URL.createObjectURL(blobResponse)),
-                (new THREE.TextureLoader(manager)).load({
+        loader.load({
+            "T-Shirt": "/models/TShirt.glb",
+            "Cap": "/models/Cap.glb",
+            "Pants": "/models/Pants.glb",
+            "Hoodie": "/models/Hoodie.glb"
+        }[forModel], function (gltf) {
+            gltf.scene.add(light)
+            const loadMeshTextureAndNormals = () => new Promise((resolve, reject) => {
+                const manager = new THREE.LoadingManager(() => resolve(textureAndNormals))
+                const textureAndNormals = [
+                    (new THREE.TextureLoader(manager)).load(URL.createObjectURL(blobResponse)),
+                    (new THREE.TextureLoader(manager)).load({
                         "T-Shirt": "/images/T_TShirt_NL_8K.png",
                         "Cap": "/images/T_Cap_NL_8K.png",
                         "Pants": "/images/T_Pants_NL_8K.png",
                         "Hoodie": "/images/T_Hoodie_NL_8K.png",
                     }[forModel]),
-            ]
-        })
-        loadMeshTextureAndNormals().then(result => {
-            result[0].flipY = false
-            result[1].flipY = false
-            material.map = result[0]
-            material.normalMap = result[1]
-            gltf.scene.traverse(o => {
-            if (o.isMesh) {
-                o.material = material
-            }
+                ]
             })
-            renderer.clear()
-            renderer.render(gltf.scene, camera)
-            let copiedCanvas = document.createElement("canvas")
-            copiedCanvas.classList.add("wide")
-            copiedCanvas.setAttribute("width", 1200)
-            copiedCanvas.setAttribute("height", 1200)
-            copiedCanvas.getContext("2d").drawImage(renderer.domElement, 0, 0)
-            document.querySelectorAll(".grid__placeholder-item")[i].appendChild(copiedCanvas)
-            document.querySelectorAll(".grid__placeholder-item")[i].style = "background: unset; aspect-ratio: unset;"
-            document.querySelectorAll(".grid__placeholder-item")[i].addEventListener("click", () => {
-                window.location.href = `https://contest.innohassle.ru/artwork.html?id=${filesResponseBounded[i]["id"]}`
+            loadMeshTextureAndNormals().then(result => {
+                result[0].flipY = false
+                result[1].flipY = false
+                material.map = result[0]
+                material.normalMap = result[1]
+                gltf.scene.traverse(o => {
+                    if (o.isMesh) {
+                        o.material = material
+                    }
+                })
+                renderer.clear()
+                renderer.render(gltf.scene, camera)
+                let copiedCanvas = document.createElement("canvas")
+                copiedCanvas.classList.add("wide")
+                copiedCanvas.setAttribute("width", 1200)
+                copiedCanvas.setAttribute("height", 1200)
+                copiedCanvas.getContext("2d").drawImage(renderer.domElement, 0, 0)
+                document.querySelectorAll(".grid__placeholder-item")[i].appendChild(copiedCanvas)
+                document.querySelectorAll(".grid__placeholder-item")[i].style = "background: unset; aspect-ratio: unset;"
+                document.querySelectorAll(".grid__placeholder-item")[i].addEventListener("click", () => {
+                    window.location.href = `https://contest.innohassle.ru/artwork.html?id=${filesResponseBounded[i]["id"]}`
+                })
+                createPreviews()
             })
-            createPreviews()
+        }, undefined, function (error) {
+            console.error(error)
         })
-    }, undefined, function (error) {
-        console.error(error)
+        manipulativeCanvas.remove()
     })
 }
 
