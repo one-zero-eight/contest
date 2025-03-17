@@ -71,6 +71,7 @@ body {
     box-sizing: border-box;
     background-color: var(--bc);
     overflow-x: hidden;
+    overscroll-behavior: contain;
 }
 
 .grid__placeholder-item__viewer {
