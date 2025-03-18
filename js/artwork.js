@@ -58,14 +58,18 @@ async function someBrowsersDoNotSupportGlobalAwaits() {
             await new Promise(resolve => setTimeout(resolve, time))
         }
     }
-    thumbnailResponse.thumbnailLink = thumbnailResponse["thumbnailLink"].slice(0, thumbnailResponse["thumbnailLink"].indexOf("=s")) + "=s1920"
+    try {
+        thumbnailResponse.thumbnailLink = thumbnailResponse["thumbnailLink"].slice(0, thumbnailResponse["thumbnailLink"].indexOf("=s")) + "=s1920"
+    } catch (e) {
+        thumbnailResponse.thumbnailLink = null
+    }
 
     responseAwaits = 1
 
     let currentImage
     while (true) {
-        currentImage = (await fetch(`${thumbnailResponse["thumbnailLink"]}`))
-        if (currentImage["status"] == 200) {
+        currentImage = thumbnailResponse["thumbnailLink"] == null ? null : (await fetch(`${thumbnailResponse["thumbnailLink"]}`))
+        if (currentImage != null && currentImage["status"] == 200) {
             currentImage = await currentImage.blob()
             break
         } else {
