@@ -65,7 +65,11 @@ async function someBrowsersDoNotSupportGlobalAwaits() {
                 await new Promise(resolve => setTimeout(resolve, time))
             }
         }
-        elem.thumbnailLink = thumbnailResponse["thumbnailLink"].slice(0, thumbnailResponse["thumbnailLink"].indexOf("=s")) + "=s600"
+        try {
+            elem.thumbnailLink = thumbnailResponse["thumbnailLink"].slice(0, thumbnailResponse["thumbnailLink"].indexOf("=s")) + "=s600"
+        } catch (e) {
+            elem.thumbnailLink = null
+        }
 
         responseAwaits = 1
 
@@ -96,8 +100,8 @@ async function createPreviews() {
 
     let blobResponse
     while (true) {
-        blobResponse = (await fetch(`${file["thumbnailLink"]}`))
-        if (blobResponse["status"] == 200) {
+        blobResponse = file["thumbnailLink"] == null ? null : (await fetch(`${file["thumbnailLink"]}`))
+        if (blobResponse != null && blobResponse["status"] == 200) {
             blobResponse = await blobResponse.blob()
             break
         } else {
