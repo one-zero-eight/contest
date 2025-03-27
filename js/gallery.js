@@ -9,9 +9,11 @@ let filesResponseBoundedIterator;
 async function initializeGallery() {
   // Create file objects from texture data
   for (const texture of textureData) {
+    // Use thumbnail path instead of original texture path
+    const thumbnailPath = texture.path.replace('/textures/', '/thumbnails/');
     filesResponseBounded.push({
       id: texture.id,
-      thumbnailLink: texture.path
+      thumbnailLink: thumbnailPath
     });
     
     sheetResponseBounded.push([
