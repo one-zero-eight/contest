@@ -45,8 +45,6 @@ async function createPreviews() {
         return
     let [i, file] = res.value
 
-    let responseAwaits = 1
-
     // Load texture from local file
     let blobResponse = await fetch(file["thumbnailLink"])
     if (blobResponse.status !== 200) {
