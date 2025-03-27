@@ -113,9 +113,19 @@ async function createPreviews() {
                 copiedCanvas.getContext("2d").drawImage(renderer.domElement, 0, 0)
                 document.querySelectorAll(".grid__placeholder-item")[i].appendChild(copiedCanvas)
                 document.querySelectorAll(".grid__placeholder-item")[i].style = "background: unset; aspect-ratio: unset;"
-                document.querySelectorAll(".grid__placeholder-item")[i].addEventListener("click", () => {
-                    window.location.href = `https://contest.innohassle.ru/artwork.html?id=${filesResponseBounded[i]["id"]}`
-                })
+                // Create a proper link element instead of using click handler
+                const linkElement = document.createElement("a");
+                linkElement.href = `/artwork.html?id=${filesResponseBounded[i]["id"]}`;
+                linkElement.style.display = "block";
+                linkElement.style.width = "100%";
+                linkElement.style.height = "100%";
+                linkElement.style.position = "absolute";
+                linkElement.style.top = "0";
+                linkElement.style.left = "0";
+                
+                // Ensure the parent has position relative for absolute positioning of the link
+                document.querySelectorAll(".grid__placeholder-item")[i].style.position = "relative";
+                document.querySelectorAll(".grid__placeholder-item")[i].appendChild(linkElement);
                 createPreviews()
             })
         }, undefined, function (error) {
@@ -133,10 +143,17 @@ document.querySelector(".burger").addEventListener("click", () => {
 
 let loadingOpacity = 1
 function loadingGradualDisappearing() {
-    loadingOpacity -= 0.01
+    loadingOpacity -= 0.05  // Increased from 0.01 to 0.05 for faster fading
     loadingOpacity = Math.max(loadingOpacity, 0)
     document.querySelector(".loading").style.opacity = loadingOpacity
-    setTimeout(loadingGradualDisappearing, 100)
+    
+    // If opacity reaches 0, hide the element completely for better performance
+    if (loadingOpacity <= 0) {
+        document.querySelector(".loading").style.display = "none";
+        return; // Stop the recursive calls once fully hidden
+    }
+    
+    setTimeout(loadingGradualDisappearing, 50) // Decreased from 100ms to 50ms
 }
 loadingGradualDisappearing()
 
