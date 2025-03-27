@@ -1,135 +1,126 @@
 import * as THREE from "three"
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 
-let sheetResponseBounded = []
-let filesResponseBounded = []
+// Texture mapping data - same as in gallery.js
+const textureData = [
+  { id: "1osaWv1_9tMylJQNljvkgREz19yGC4LDX", path: "/textures/T-Shirt_1osaWv1_9tMylJQNljvkgREz19yGC4LDX.png", modelType: "T-Shirt", color: "#16161a" },
+  { id: "1-pgetUn63L_v4i3c-HSIeuut7SUrdTe8", path: "/textures/T-Shirt_1-pgetUn63L_v4i3c-HSIeuut7SUrdTe8.png", modelType: "T-Shirt", color: "#16161a" },
+  { id: "1nyJ5XxtbhOaQBk2fFSTnMtYqds-i8zXl", path: "/textures/T-Shirt_1nyJ5XxtbhOaQBk2fFSTnMtYqds-i8zXl.png", modelType: "T-Shirt", color: "#16161a" },
+  { id: "1pQgQS6WIk6fcwrs4kzKsA1OF3U5rKzLY", path: "/textures/T-Shirt_1pQgQS6WIk6fcwrs4kzKsA1OF3U5rKzLY.png", modelType: "T-Shirt", color: "#16161a" },
+  { id: "1o72a31y67NFZNPaBLR2c2ZfqxvLl7Mq9", path: "/textures/Cap_1o72a31y67NFZNPaBLR2c2ZfqxvLl7Mq9.png", modelType: "Cap", color: "#16161a" },
+  { id: "1pbcIF0GTxlApgm9YgjXqEqBSG71mvbNg", path: "/textures/T-Shirt_1pbcIF0GTxlApgm9YgjXqEqBSG71mvbNg.png", modelType: "T-Shirt", color: "#16161a" },
+  { id: "1kInUqRwgjdxpTRVOxsHu9ER5BPz2pZpC", path: "/textures/Pants_1kInUqRwgjdxpTRVOxsHu9ER5BPz2pZpC.png", modelType: "Pants", color: "#16161a" },
+  { id: "1AH1KscqsgsdHY_oobQLY__Ps6wRsq3Kz", path: "/textures/Hoodie_1AH1KscqsgsdHY_oobQLY__Ps6wRsq3Kz.png", modelType: "Hoodie", color: "#16161a" },
+  { id: "1GBfmdKVCr70yfqCnxT7QeNuhp02iY3_z", path: "/textures/Cap_1GBfmdKVCr70yfqCnxT7QeNuhp02iY3_z.png", modelType: "Cap", color: "#16161a" },
+  { id: "1EYegDwbPcHq_L5Tlv5LTqgreaHPSWlb_", path: "/textures/T-Shirt_1EYegDwbPcHq_L5Tlv5LTqgreaHPSWlb_.png", modelType: "T-Shirt", color: "#16161a" },
+  { id: "1PXqXexCtjYiQj8PrQoRPgFrY7ztW-vBl", path: "/textures/Hoodie_1PXqXexCtjYiQj8PrQoRPgFrY7ztW-vBl.png", modelType: "Hoodie", color: "#16161a" },
+  { id: "1JnaHtr_BUkwvD1VW1Qz-gP70i3OY7yN_", path: "/textures/Hoodie_1JnaHtr_BUkwvD1VW1Qz-gP70i3OY7yN_.png", modelType: "Hoodie", color: "#16161a" },
+  { id: "1_NClc4_9qxRcGCNRwGWbDT7Zjw3eBeh1", path: "/textures/Hoodie_1_NClc4_9qxRcGCNRwGWbDT7Zjw3eBeh1.png", modelType: "Hoodie", color: "#16161a" },
+  { id: "1-NPe0Rdst0XZ-4O_scUUuxEyMjT1AIym", path: "/textures/T-Shirt_1-NPe0Rdst0XZ-4O_scUUuxEyMjT1AIym.png", modelType: "T-Shirt", color: "#16161a" },
+  { id: "1JXkvEckBfNJgGO-EzIYZyHoLf2KOiZUw", path: "/textures/Cap_1JXkvEckBfNJgGO-EzIYZyHoLf2KOiZUw.png", modelType: "Cap", color: "#16161a" },
+  { id: "1rf9RKFZBHUz43fXZoBtHP58tMyOJ4oLI", path: "/textures/Hoodie_1rf9RKFZBHUz43fXZoBtHP58tMyOJ4oLI.png", modelType: "Hoodie", color: "#16161a" },
+  { id: "1WMJobNk831kBSlYQUdN_9GSF0zAW7WZe", path: "/textures/T-Shirt_1WMJobNk831kBSlYQUdN_9GSF0zAW7WZe.png", modelType: "T-Shirt", color: "#16161a" },
+  { id: "1xWJlPKo2o22GGzxXaqeu7TQ5zC0-pRPH", path: "/textures/Hoodie_1xWJlPKo2o22GGzxXaqeu7TQ5zC0-pRPH.png", modelType: "Hoodie", color: "#16161a" },
+  { id: "1fYu0n7Qzetq82h5Mpan84dBEnitzso1G", path: "/textures/Cap_1fYu0n7Qzetq82h5Mpan84dBEnitzso1G.png", modelType: "Cap", color: "#16161a" },
+  { id: "1g5cQPPlfhWgpGSjdlT94LkMq3GyY2baA", path: "/textures/T-Shirt_1g5cQPPlfhWgpGSjdlT94LkMq3GyY2baA.png", modelType: "T-Shirt", color: "#16161a" },
+  { id: "1c5Fgj6rb6MQESFICOQkSLwaA7pzwyOdu", path: "/textures/Hoodie_1c5Fgj6rb6MQESFICOQkSLwaA7pzwyOdu.png", modelType: "Hoodie", color: "#16161a" },
+  { id: "1-qLUR0uV7ybiCZwJ7qZJWjqQQZYz3SV7", path: "/textures/Pants_1-qLUR0uV7ybiCZwJ7qZJWjqQQZYz3SV7.png", modelType: "Pants", color: "#16161a" },
+  { id: "1yTdsXfzY9S_7aACaKkKNczKWPOVmiqZg", path: "/textures/Cap_1yTdsXfzY9S_7aACaKkKNczKWPOVmiqZg.png", modelType: "Cap", color: "#16161a" },
+  { id: "1hWciYSNP8EOnn3TQkqzRBsmShY1GyFmd", path: "/textures/T-Shirt_1hWciYSNP8EOnn3TQkqzRBsmShY1GyFmd.png", modelType: "T-Shirt", color: "#16161a" },
+  { id: "1MV4glqqRjmk-Yi_IveR3oEtFweYBVbBX", path: "/textures/T-Shirt_1MV4glqqRjmk-Yi_IveR3oEtFweYBVbBX.png", modelType: "T-Shirt", color: "#16161a" },
+  { id: "1uytdzOoj9NlCRFWlMWCXGppk4v7KdpiT", path: "/textures/T-Shirt_1uytdzOoj9NlCRFWlMWCXGppk4v7KdpiT.png", modelType: "T-Shirt", color: "#16161a" },
+  { id: "1QrbXswa_nkTvQwFHZWPZTgJWB921K6tT", path: "/textures/Cap_1QrbXswa_nkTvQwFHZWPZTgJWB921K6tT.png", modelType: "Cap", color: "#16161a" },
+  { id: "1HlP6o0hu70W9LI-ahTlEOjMih-nO6Hd_", path: "/textures/Pants_1HlP6o0hu70W9LI-ahTlEOjMih-nO6Hd_.png", modelType: "Pants", color: "#16161a" },
+  { id: "16bhqSwGD9zy7kRiNu0wUkz4lbbMyipWO", path: "/textures/Hoodie_16bhqSwGD9zy7kRiNu0wUkz4lbbMyipWO.png", modelType: "Hoodie", color: "#16161a" },
+  { id: "1g7WviHNox-hsIzD2VXBfErtq7NciSNv2", path: "/textures/T-Shirt_1g7WviHNox-hsIzD2VXBfErtq7NciSNv2.png", modelType: "T-Shirt", color: "#16161a" },
+  { id: "1vmyVU_64rOMzCwkn9wD-NLASt13QvNkP", path: "/textures/Pants_1vmyVU_64rOMzCwkn9wD-NLASt13QvNkP.png", modelType: "Pants", color: "#16161a" },
+  { id: "1BoD-KURY_xXtR8R85EHHvAUixzs5SMwj", path: "/textures/Hoodie_1BoD-KURY_xXtR8R85EHHvAUixzs5SMwj.png", modelType: "Hoodie", color: "#16161a" },
+  { id: "1LiyrTh1KgA9ks89yxe0_t9oqZqao_hKd", path: "/textures/Cap_1LiyrTh1KgA9ks89yxe0_t9oqZqao_hKd.png", modelType: "Cap", color: "#16161a" },
+  { id: "1voCeV-JXzu7vZMzQiTOSmyrfPLoKMJ5G", path: "/textures/Hoodie_1voCeV-JXzu7vZMzQiTOSmyrfPLoKMJ5G.png", modelType: "Hoodie", color: "#16161a" },
+  { id: "1m2pLRoF7wJ4btKPv0rCirneuWMSBjZVt", path: "/textures/Hoodie_1m2pLRoF7wJ4btKPv0rCirneuWMSBjZVt.png", modelType: "Hoodie", color: "#16161a" },
+  { id: "1-PRw20BQGvtuvjU8aHL-615tfB3Y2Rz7", path: "/textures/Hoodie_1-PRw20BQGvtuvjU8aHL-615tfB3Y2Rz7.png", modelType: "Hoodie", color: "#16161a" },
+  { id: "1RlIEi5ZUABzMZI02jkbgX5l5M9Nx2UTs", path: "/textures/Pants_1RlIEi5ZUABzMZI02jkbgX5l5M9Nx2UTs.png", modelType: "Pants", color: "#16161a" },
+  { id: "1ZJ0-4VfZ27-YzckT5eoYE5tQ_nEYsjn6", path: "/textures/T-Shirt_1ZJ0-4VfZ27-YzckT5eoYE5tQ_nEYsjn6.png", modelType: "T-Shirt", color: "#16161a" },
+  { id: "1EktKoGbKMNJOKGlpHwwcfPGHaqDgT_Lq", path: "/textures/T-Shirt_1EktKoGbKMNJOKGlpHwwcfPGHaqDgT_Lq.png", modelType: "T-Shirt", color: "#16161a" },
+  { id: "1a1yhdeW2IB5fzmHHm2-xkYwriOSG9OES", path: "/textures/T-Shirt_1a1yhdeW2IB5fzmHHm2-xkYwriOSG9OES.png", modelType: "T-Shirt", color: "#16161a" },
+  { id: "1N07vt7TO8lmljqcqpYORbY3gcYgVvk2j", path: "/textures/T-Shirt_1N07vt7TO8lmljqcqpYORbY3gcYgVvk2j.png", modelType: "T-Shirt", color: "#16161a" },
+  { id: "1V7Vp2fO1HZujZrW5utXm-Ns5ZL9eKrXl", path: "/textures/T-Shirt_1V7Vp2fO1HZujZrW5utXm-Ns5ZL9eKrXl.png", modelType: "T-Shirt", color: "#16161a" }
+];
 
-let apiKey = "AIzaSyAaK_K5ZedO5Gez6qd45s--Djk8XyqeBBw"
+let sheetResponseBounded = [];
+let filesResponseBounded = [];
 
-async function someBrowsersDoNotSupportGlobalAwaits() {
-    let responseAwaits = 1
-
-    let filesResponse
-    let sheetResponse
-
-    while (true) {
-        filesResponse = await fetch(`https://www.googleapis.com/drive/v3/files?q='1BHeR3ZdgC78LlmGCWX-VjlHYXkfbC0YVWngzeaQ5S5GXXUo5jMQicIOlS9hlYOyo0p4p2cXT'+in+parents&key=${apiKey}`)
-        if (filesResponse["status"] == 200) {
-            filesResponse = await filesResponse.json()
-            break
-        } else {
-            responseAwaits += 1
-            let time = 2 ** responseAwaits * 1000 + Math.random() * 1000
-            changeVariant(time)
-            await new Promise(resolve => setTimeout(resolve, time))
-        }
+async function initializeArtwork() {
+  const requestedArtworkId = (new URLSearchParams(document.location.search)).get("id");
+  
+  // Find the requested texture in the texture data
+  const currentTextureIndex = textureData.findIndex(texture => texture.id === requestedArtworkId);
+  
+  if (currentTextureIndex === -1) {
+    console.error(`Texture with ID ${requestedArtworkId} not found`);
+    changeVariant(2000);
+    return;
+  }
+  
+  // Get previous, current, and next textures
+  const prevIndex = currentTextureIndex > 0 ? currentTextureIndex - 1 : textureData.length - 1;
+  const nextIndex = currentTextureIndex < textureData.length - 1 ? currentTextureIndex + 1 : 0;
+  
+  // Add to bounded arrays for navigation
+  sheetResponseBounded.push([textureData[prevIndex].modelType, textureData[prevIndex].color, ""]);
+  filesResponseBounded.push({ id: textureData[prevIndex].id });
+  
+  sheetResponseBounded.push([textureData[currentTextureIndex].modelType, textureData[currentTextureIndex].color, ""]);
+  filesResponseBounded.push({ id: textureData[currentTextureIndex].id });
+  
+  sheetResponseBounded.push([textureData[nextIndex].modelType, textureData[nextIndex].color, ""]);
+  filesResponseBounded.push({ id: textureData[nextIndex].id });
+  
+  // Load the current texture
+  try {
+    const currentTexturePath = textureData[currentTextureIndex].path;
+    const response = await fetch(currentTexturePath);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to load texture: ${currentTexturePath}`);
     }
-
-    responseAwaits = 1
-
-    while (true) {
-        sheetResponse = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/1zAAbzVA5-qK7UevrBGPiIJ0uHYu9wcegUK0pTES0JSw/values/Sheet1?key=${apiKey}`)
-        if (sheetResponse["status"] == 200) {
-            sheetResponse = await sheetResponse.json()
-            break
-        } else {
-            responseAwaits += 1
-            let time = 2 ** responseAwaits * 1000 + Math.random() * 1000
-            changeVariant(time)
-            await new Promise(resolve => setTimeout(resolve, time))
-        }
-    }
-    sheetResponse["values"].reverse()
-
-    responseAwaits = 1
-
-    let requestedArtworkId = (new URLSearchParams(document.location.search)).get("id")
-
-    let thumbnailResponse
-    while (true) {
-        thumbnailResponse = await fetch(`https://www.googleapis.com/drive/v3/files/${requestedArtworkId}?fields=thumbnailLink&key=${apiKey}`)
-        if (thumbnailResponse["status"] == 200) {
-            thumbnailResponse = await thumbnailResponse.json()
-            break
-        } else {
-            responseAwaits += 1
-            let time = 2 ** responseAwaits * 1000 + Math.random() * 1000
-            changeVariant(time)
-            await new Promise(resolve => setTimeout(resolve, time))
-        }
-    }
-    try {
-        thumbnailResponse.thumbnailLink = thumbnailResponse["thumbnailLink"].slice(0, thumbnailResponse["thumbnailLink"].indexOf("=s")) + "=s1920"
-    } catch (e) {
-        thumbnailResponse.thumbnailLink = null
-    }
-
-    responseAwaits = 1
-
-    let currentImage
-    while (true) {
-        currentImage = thumbnailResponse["thumbnailLink"] == null ? null : (await fetch(`${thumbnailResponse["thumbnailLink"]}`))
-        if (currentImage != null && currentImage["status"] == 200) {
-            currentImage = await currentImage.blob()
-            break
-        } else {
-            currentImage = await fetch(`https://www.googleapis.com/drive/v3/files/${requestedArtworkId}?key=${apiKey}&alt=media`)
-            if (currentImage["status"] == 200) {
-                currentImage = await currentImage.blob()
-                break
-            } else {
-                responseAwaits += 1
-                let time = 2 ** responseAwaits * 1000 + Math.random() * 1000
-                changeVariant(time)
-                await new Promise(resolve => setTimeout(resolve, time))
-            }
-        }
-    }
-
-    let bitmap = await window.createImageBitmap(currentImage)
-    let manipulativeCanvas = document.createElement("canvas")
-    manipulativeCanvas.setAttribute("width", bitmap.width)
-    manipulativeCanvas.setAttribute("height", bitmap.height)
-    let context = manipulativeCanvas.getContext("2d")
-    context.drawImage(bitmap, 0, 0)
-    let imageData = context.getImageData(0, 0, bitmap.width, bitmap.height)
-    let data = imageData.data
+    
+    const currentImage = await response.blob();
+    
+    // Process the image
+    const bitmap = await window.createImageBitmap(currentImage);
+    const manipulativeCanvas = document.createElement("canvas");
+    manipulativeCanvas.setAttribute("width", bitmap.width);
+    manipulativeCanvas.setAttribute("height", bitmap.height);
+    
+    const context = manipulativeCanvas.getContext("2d");
+    context.drawImage(bitmap, 0, 0);
+    
+    const imageData = context.getImageData(0, 0, bitmap.width, bitmap.height);
+    const data = imageData.data;
+    
     for (let i = 0; i < data.length; i += 4) {
-        if (data[i] < 3 && data[i + 1] < 3 && data[i + 2] < 3) {
-            data[i] = data[i + 1] = data[i + 2] = 3
-        }
+      if (data[i] < 3 && data[i + 1] < 3 && data[i + 2] < 3) {
+        data[i] = data[i + 1] = data[i + 2] = 3;
+      }
     }
-    context.putImageData(imageData, 0, 0)
-    manipulativeCanvas.toBlob(currentImage => {
-
-        for (let [i, elem] of sheetResponse["values"].entries()) {
-            if (elem.length == 3 && elem[0] != "For which model is this texture for?") {
-                if (filesResponse["files"][i]["id"] != requestedArtworkId)
-                    continue
-
-                let previousIndex = i > 0 ? i - 1 : filesResponse["files"].length - 1
-                while (sheetResponse["values"][previousIndex].length != 3 || sheetResponse["values"][previousIndex][0] == "For which model is this texture for?")
-                    previousIndex = previousIndex > 0 ? previousIndex - 1 : filesResponse["files"].length - 1
-                let nextIndex = i < filesResponse["files"].length - 1 ? i + 1 : 0
-                while (sheetResponse["values"][nextIndex].length != 3 || sheetResponse["values"][nextIndex][0] == "For which model is this texture for?")
-                    nextIndex = nextIndex < filesResponse["files"].length - 1 ? nextIndex + 1 : 0
-                sheetResponseBounded.push(sheetResponse["values"][previousIndex])
-                filesResponseBounded.push(filesResponse["files"][previousIndex])
-                sheetResponseBounded.push(sheetResponse["values"][i])
-                filesResponseBounded.push(filesResponse["files"][i])
-                sheetResponseBounded.push(sheetResponse["values"][nextIndex])
-                filesResponseBounded.push(filesResponse["files"][nextIndex])
-                break
-            }
-        }
-
-        createView(currentImage, requestedArtworkId)
-        document.querySelector("#get").setAttribute("href", URL.createObjectURL(currentImage))
-        document.querySelector("#get").setAttribute("download", `T_${sheetResponseBounded[1][0].replace("-", "")}_BC`)
-        manipulativeCanvas.remove()
-    })
+    
+    context.putImageData(imageData, 0, 0);
+    
+    manipulativeCanvas.toBlob(processedImage => {
+      createView(processedImage, requestedArtworkId);
+      document.querySelector("#get").setAttribute("href", URL.createObjectURL(processedImage));
+      document.querySelector("#get").setAttribute("download", `T_${sheetResponseBounded[1][0].replace("-", "")}_BC`);
+      manipulativeCanvas.remove();
+    });
+    
+  } catch (error) {
+    console.error("Error loading texture:", error);
+    changeVariant(2000);
+  }
 }
-someBrowsersDoNotSupportGlobalAwaits()
+
+initializeArtwork();
 addEventListeners()
 
 let camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000)
