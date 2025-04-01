@@ -5,11 +5,15 @@ import {textureData} from "./texture-data";
 let sheetResponseBounded = [];
 let filesResponseBounded = [];
 
+// Filter only the winners' works
+const winnerAliases = ["@Art_libra", "@baki_sofia", "@naaandor"];
+const winnersWorks = textureData.filter(texture => winnerAliases.includes(texture.alias));
+
 async function initializeArtwork() {
   const requestedArtworkId = (new URLSearchParams(document.location.search)).get("id");
   
-  // Find the requested texture in the texture data
-  const currentTextureIndex = textureData.findIndex(texture => texture.id === requestedArtworkId);
+  // Find the requested texture in the winners' texture data
+  const currentTextureIndex = winnersWorks.findIndex(texture => texture.id === requestedArtworkId);
   
   if (currentTextureIndex === -1) {
     console.error(`Texture with ID ${requestedArtworkId} not found`);
@@ -18,18 +22,39 @@ async function initializeArtwork() {
   }
   
   // Get previous, current, and next textures
-  const prevIndex = currentTextureIndex > 0 ? currentTextureIndex - 1 : textureData.length - 1;
-  const nextIndex = currentTextureIndex < textureData.length - 1 ? currentTextureIndex + 1 : 0;
+  const prevIndex = currentTextureIndex > 0 ? currentTextureIndex - 1 : winnersWorks.length - 1;
+  const nextIndex = currentTextureIndex < winnersWorks.length - 1 ? currentTextureIndex + 1 : 0;
   
   // Add to bounded arrays for navigation
-  sheetResponseBounded.push([textureData[prevIndex].modelType, textureData[prevIndex].color, ""]);
-  filesResponseBounded.push({ id: textureData[prevIndex].id });
+  sheetResponseBounded.push([winnersWorks[prevIndex].modelType, winnersWorks[prevIndex].color, ""]);
+  filesResponseBounded.push({ 
+    id: winnersWorks[prevIndex].id,
+    alias: winnersWorks[prevIndex].alias,
+    place: winnersWorks[prevIndex].place
+  });
   
-  sheetResponseBounded.push([textureData[currentTextureIndex].modelType, textureData[currentTextureIndex].color, ""]);
-  filesResponseBounded.push({ id: textureData[currentTextureIndex].id });
+  sheetResponseBounded.push([winnersWorks[currentTextureIndex].modelType, winnersWorks[currentTextureIndex].color, ""]);
+  filesResponseBounded.push({ 
+    id: winnersWorks[currentTextureIndex].id,
+    alias: winnersWorks[currentTextureIndex].alias,
+    place: winnersWorks[currentTextureIndex].place
+  });
   
-  sheetResponseBounded.push([textureData[nextIndex].modelType, textureData[nextIndex].color, ""]);
-  filesResponseBounded.push({ id: textureData[nextIndex].id });
+  sheetResponseBounded.push([winnersWorks[nextIndex].modelType, winnersWorks[nextIndex].color, ""]);
+  filesResponseBounded.push({ 
+    id: winnersWorks[nextIndex].id,
+    alias: winnersWorks[nextIndex].alias,
+    place: winnersWorks[nextIndex].place
+  });
+  
+  // Add author and place information to the page
+  const authorInfoDiv = document.createElement("div");
+  authorInfoDiv.classList.add("author-info");
+  authorInfoDiv.innerHTML = `
+    <div class="author-name">${winnersWorks[currentTextureIndex].alias}</div>
+    <div class="author-place">${winnersWorks[currentTextureIndex].place}</div>
+  `;
+  document.querySelector(".window__vbox").prepend(authorInfoDiv);
   
   // Load the current texture
   try {

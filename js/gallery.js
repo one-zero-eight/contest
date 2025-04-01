@@ -6,20 +6,26 @@ let sheetResponseBounded = [];
 let filesResponseBounded = [];
 let filesResponseBoundedIterator;
 
+// Filter only the winners' works
+const winnerAliases = ["@Art_libra", "@baki_sofia", "@naaandor"];
+const winnersWorks = textureData.filter(texture => winnerAliases.includes(texture.alias));
+
 async function initializeGallery() {
   // Create file objects from texture data
-  for (const texture of textureData) {
+  for (const texture of winnersWorks) {
     // Use thumbnail path instead of original texture path
     const thumbnailPath = texture.path.replace('/textures/', '/thumbnails/');
     filesResponseBounded.push({
       id: texture.id,
-      thumbnailLink: thumbnailPath
+      thumbnailLink: thumbnailPath,
+      alias: texture.alias,
+      place: texture.place
     });
     
     sheetResponseBounded.push([
       texture.modelType,
       texture.color,
-      ""
+      texture.alias
     ]);
     
     // Create placeholder for each texture
@@ -125,6 +131,15 @@ async function createPreviews() {
                 
                 // Ensure the parent has position relative for absolute positioning of the link
                 document.querySelectorAll(".grid__placeholder-item")[i].style.position = "relative";
+                
+                // Add author and place information
+                const infoDiv = document.createElement("div");
+                infoDiv.classList.add("artwork-info");
+                infoDiv.innerHTML = `
+                    <div class="artwork-author">${filesResponseBounded[i]["alias"]}</div>
+                    <div class="artwork-place">${filesResponseBounded[i]["place"]}</div>
+                `;
+                document.querySelectorAll(".grid__placeholder-item")[i].appendChild(infoDiv);
                 document.querySelectorAll(".grid__placeholder-item")[i].appendChild(linkElement);
                 createPreviews()
             })

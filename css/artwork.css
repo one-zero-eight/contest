@@ -219,6 +219,27 @@ body {
     width: 100%;
 }
 
+/* Author info styles for artwork page */
+.author-info {
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    text-align: center;
+    width: 100%;
+}
+
+.author-name {
+    font: 700 20px/26px "Roboto";
+    margin-bottom: 5px;
+}
+
+.author-place {
+    font: 500 18px/22px "Roboto";
+    color: #ffcd28;
+}
+
 @media (width < 1128px) {
     .font {
         line-height: 20px;
@@ -441,4 +462,3 @@ body {
         padding-top: 60px;
     }
 }
-
